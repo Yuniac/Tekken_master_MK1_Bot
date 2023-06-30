@@ -16,21 +16,26 @@ const client = new Client({
 client.login(process.env.discord_token);
 
 client.commands = new Map();
-const rootCommandsDirath = path.join(__dirname, "commands");
-const commandFiles = fs
-  .readdirSync(rootCommandsDirath)
-  .filter((file) => file.endsWith(".ts"));
+const rootCommandsDirPath = path.join(__dirname, "commands");
+const commandFolders = fs.readdirSync(rootCommandsDirPath);
 
-for (const commandFile of commandFiles) {
-  const filePath = path.join(rootCommandsDirath, commandFile);
-  const command = require(filePath) as { data: Function; execute: Function };
+for (const commandFolder of commandFolders) {
+  const commandsPath = path.join(rootCommandsDirPath, commandFolder);
+  const commandFiles = fs
+    .readdirSync(commandsPath)
+    .filter((file) => file.endsWith(".ts"));
+  for (const file of commandFiles) {
+    const filePath = path.join(commandsPath, file);
+    console.log(">", filePath);
+    const command = require(filePath) as { data: Function; execute: Function };
 
-  if ("data" in command && "execute" in command) {
-    client.commands.set(command.data.name, command);
-  } else {
-    console.log(
-      `[WARNING] The command at ${filePath} is missing a required "command" or "execute" property.`
-    );
+    if ("data" in command && "execute" in command) {
+      client.commands.set(command.data.name, command);
+    } else {
+      console.log(
+        `[WARNING] The command at ${filePath} is missing a required "command" or "execute" property.`
+      );
+    }
   }
 }
 
@@ -51,7 +56,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
   }
 
   try {
-    await command.execute();
+    await command.execute(interaction);
   } catch (e) {
     console.error(e);
     if (interaction.replied || interaction.deferred) {

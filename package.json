@@ -10,7 +10,8 @@
     "lodash": "^4.17.21"
   },
   "scripts": {
-    "start": "ts-node src/index.ts"
+    "start": "ts-node src/index.ts",
+    "deploy-commands": "ts-node src/deploy-command.ts"
   },
   "devDependencies": {
     "@types/node": "^20.3.2",
