@@ -27,7 +27,7 @@ export const initDiscord = () => {
       .filter((file) => file.endsWith(".ts"));
     for (const file of commandFiles) {
       const filePath = path.join(commandsPath, file);
-      console.log(">", filePath);
+      console.log("Reading", filePath, "...");
       const command = require(filePath) as {
         data: Function;
         execute: Function;
@@ -51,7 +51,7 @@ export const initDiscord = () => {
     if (!interaction.isChatInputCommand()) {
       return;
     }
-    console.log("Interaction", interaction);
+
     const client = interaction.client as DiscordClient;
     const command = client.commands.get(interaction.commandName);
 

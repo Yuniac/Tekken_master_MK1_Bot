@@ -28,13 +28,13 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
 
   if (password !== _password) {
     return interaction.reply(
-      "Incorrect password. This command is only available for admins"
+      "Error: Incorrect password. This command is only available for admins"
     );
   }
 
   if (!user) {
     return interaction.reply(
-      "Sorry, someting went wrong and we can't process this user at this time."
+      "Error: Sorry, someting went wrong and we can't process this user at this time."
     );
   }
 
@@ -43,7 +43,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
 
   if (userExist) {
     return interaction.reply(
-      `A user with the name of **${name}** already exists. Use **/make-admin** instead, to promote an already registered member to an admin.`
+      `Error: A user with the name of **${name}** already exists. Use **/make-admin** instead, to promote an already registered member to an admin.`
     );
   }
 
@@ -62,7 +62,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
   } catch (e: any) {
     console.log(e);
     interaction.reply(
-      `Sorry, something went wrong while storing your user data. Share this error with our developers to help you: "${e}"`
+      `Error: Sorry, something went wrong while storing your user data. Share this error with our developers to help you: "${e}"`
     );
   }
 };
