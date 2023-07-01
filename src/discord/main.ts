@@ -5,6 +5,7 @@ import fs from "fs";
 import { DiscordClient } from "../types/client";
 import { DiscordRoles } from "../models/enums/discordRoles";
 import UserModal from "../models/user";
+import { RanksBreakingPoints } from "../models/enums/ranksBreakingPoints";
 
 export const initDiscord = () => {
   console.log("Welcome. Firing up!");

@@ -5,6 +5,7 @@ import {
 } from "discord.js";
 import UserModal from "../../models/user";
 import { format } from "date-fns";
+import { StringHelper } from "../../helpers/String.helper";
 
 const data = new SlashCommandBuilder()
   .setName("player")
@@ -36,7 +37,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
       ${isAdmin ? "-Admin" : ""}
       -ID: ${discordId}
       -Points: ${points}
-      -Rank: ${rank}
+      -Rank: ${StringHelper.humanize(rank)}
       -Registered at: ${format(new Date(createdAt), "dd-MM-Y K:a")}
     `);
 };

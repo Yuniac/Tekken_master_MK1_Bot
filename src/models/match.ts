@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { MatchesKind } from "./enums/matchesKinds";
 import UserModal from "./user";
+import { Ranks } from "./enums/ranks";
 const Schema = mongoose.Schema;
 
 const MatchSchema = new Schema(
@@ -30,6 +31,16 @@ const MatchSchema = new Schema(
     player2Name: {
       requried: true,
       type: String,
+    },
+    player1Rank: {
+      required: true,
+      type: String,
+      enum: Ranks,
+    },
+    player2Rank: {
+      required: true,
+      type: String,
+      enum: Ranks,
     },
   },
   {

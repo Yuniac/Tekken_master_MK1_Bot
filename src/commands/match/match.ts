@@ -7,6 +7,9 @@ import {
 } from "discord.js";
 import UserModal from "../../models/user";
 import MatchModal from "../../models/match";
+import { MatchHelper } from "../../helpers/match.helper";
+import { Ranks } from "../../models/enums/ranks";
+import { MongooseUser } from "../../types/mongoose/User";
 
 const data = new SlashCommandBuilder()
   .setName("m")
@@ -48,8 +51,12 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
     );
   }
 
-  const existingUser = await UserModal.findOne({ name: user.username });
-  const existingOpponent = await UserModal.findOne({ name: opponent.username });
+  const existingUser = (await UserModal.findOne({
+    name: user.username,
+  })) as MongooseUser;
+  const existingOpponent = (await UserModal.findOne({
+    name: opponent.username,
+  })) as MongooseUser;
 
   if (!existingUser) {
     return interaction.reply(
@@ -63,19 +70,42 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
     );
   }
 
+  const [pointsWon, pointsLost] = MatchHelper.calculatePointsWonAndLostInMatch(
+    existingUser,
+    existingOpponent
+  );
+  console.log(pointsWon, pointsLost);
   try {
-    await MatchModal.create({
-      winner: opponent.username,
-      player1Name: opponent.username,
-      player2Name: user.username,
-      pointsGained: 1,
-      pointsLost: 1,
-    });
+    await Promise.all([
+      MatchModal.create({
+        winner: opponent.username,
+        player1Name: opponent.username,
+        player2Name: user.username,
+        pointsGained: pointsWon,
+        pointsLost: pointsLost,
+        player1Rank: existingOpponent.rank,
+        player2Rank: existingUser.rank,
+      }),
+      UserModal.findOneAndUpdate(
+        { name: opponent.username },
+        { $inc: { points: pointsWon } }
+      ),
+      UserModal.findOneAndUpdate(
+        { name: user.username },
+        { $inc: { points: -pointsLost } }
+      ),
+      MatchHelper.CheckIfPlayerGainedARank(
+        existingOpponent,
+        existingUser,
+        interaction
+      ),
+    ]);
 
     interaction.reply(
-      `Match results between ${userMention(opponent.id)} and ${userMention(
-        user.id
-      )} have been saved. ${opponent.username} has won ${
+      // `Match results between ${userMention(opponent.id)} and ${userMention(
+      `The best of 5 set between ${opponent.username} and ${
+        user.username
+      } have ended. ${opponent.username} has won ${
         winnersScrore && losersScore ? `${winnersScrore}-${losersScore}` : ""
       }, GGs`
     );

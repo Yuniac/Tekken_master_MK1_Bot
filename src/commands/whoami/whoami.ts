@@ -4,6 +4,7 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 import UserModal from "../../models/user";
+import { StringHelper } from "../../helpers/String.helper";
 
 const data = new SlashCommandBuilder()
   .setName("myself")
@@ -27,7 +28,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
 
     -ID: ${discordId}
     -Points: ${points}
-    -Rank: ${rank}
+    -Rank: ${StringHelper.humanize(rank)}
   `);
 };
 
