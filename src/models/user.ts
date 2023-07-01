@@ -15,12 +15,17 @@ const UserSchema = new Schema(
     },
     rank: {
       required: false,
-      type: Ranks,
+      type: String,
+      enum: Ranks,
     },
     isAdmin: {
       required: false,
       type: Boolean,
       default: false,
+    },
+    discordId: {
+      required: true,
+      type: String,
     },
   },
   {

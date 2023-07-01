@@ -6,4 +6,5 @@ export enum Ranks {
   medium = "Medium",
   amateur = "Amateur",
   noob = "Noob",
+  unranked = "Unranked",
 }

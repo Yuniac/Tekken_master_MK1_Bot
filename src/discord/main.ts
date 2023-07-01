@@ -46,6 +46,7 @@ export const initDiscord = () => {
   client.once(Events.ClientReady, (_client) => {
     console.log(`Ready! Logged in as ${_client.user.tag}`);
   });
+
   client.on(Events.InteractionCreate, async (interaction) => {
     if (!interaction.isChatInputCommand()) {
       return;
