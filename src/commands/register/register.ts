@@ -17,37 +17,51 @@ const data = new SlashCommandBuilder()
   );
 
 const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
+  const embeddedUser = interaction.user;
+
   const user = interaction.options.getUser("name");
   if (!user) {
     return interaction.reply(
-      "Sorry, someting went wrong and we can't process this user at this time."
+      "Error: Sorry, someting went wrong and we can't process this user at this time."
     );
   }
 
-  const name = user.username;
-  const userExist = await UserModal.findOne({ name });
+  const [existingUser, embeddedUserAsMongoUser] = await Promise.all([
+    UserModal.findOne({ name: user.username }),
+    UserModal.findOne({ name: embeddedUser.username }),
+  ]);
 
-  if (userExist) {
+  if (existingUser) {
     return interaction.reply(
-      `A user with the name of **${name}** already exists. Please choose a different name.`
+      `A user with the name of **${user.username}** already exists. Please choose a different name.`
+    );
+  }
+  const isAnAdminRegisteringSomeone =
+    embeddedUserAsMongoUser?.isAdmin === true &&
+    embeddedUser.username !== user.username;
+
+  if (!isAnAdminRegisteringSomeone) {
+    return interaction.reply(
+      `Error: You can only register yourself. Only admins can register anyone.`
     );
   }
 
   try {
     const createdUser = await UserModal.create({
-      name,
+      name: user.username,
       isAdmin: false,
       points: 1500,
       rank: Ranks.unranked,
       discordId: user.id,
     });
 
-    interaction.reply(
-      `You have been successfully registered as a player, your name is: **${createdUser.name}**. You will need this name for most things, try to remember it. This is your ID: **${createdUser.id}**.
+    const response = isAnAdminRegisteringSomeone
+      ? `Admin **${embeddedUser.username}** has successfully registered user: **${createdUser.name}**`
+      : `You have been successfully registered as a player, your name is: **${createdUser.name}**. You will need this name for most things, try to remember it. This is your ID: **${createdUser.id}**.
 
-      If you ever need to see your info, use **/whoami**.
-      `
-    );
+    If you ever need to see your info, use **/whoami**.
+  `;
+    interaction.reply(response);
   } catch (e: any) {
     console.log(e);
     interaction.reply(

@@ -5,6 +5,7 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 import UserModal from "../../models/user";
+import { DiscordRoles } from "../../models/enums/discordRoles";
 
 const data = new SlashCommandBuilder()
   .setName("remove-admin")
@@ -27,13 +28,13 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
 
   if (password !== _password) {
     return interaction.reply(
-      "Incorrect password. This command is only available for admins"
+      "Error: Incorrect password. This command is only available for admins"
     );
   }
 
   if (!user) {
     return interaction.reply(
-      "Sorry, someting went wrong and we can't process this user at this time."
+      "Error: Sorry, someting went wrong and we can't process this user at this time."
     );
   }
 
@@ -42,24 +43,40 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
 
   if (!existingUser) {
     return interaction.reply(
-      `There's no registered user with the name **${name}**. User must be registered before they can be made an admin.`
+      `Error: There's no registered user with the name **${name}**. User must be registered before they can be made an admin.`
     );
   }
 
   if (existingUser && existingUser.isAdmin === false) {
     return interaction.reply(
-      `User **${name}** is not admin. To make a user an admin, use **/make-admin** instead.`
+      `Error: User **${name}** is not admin. To make a user an admin, use **/make-admin** instead.`
     );
   }
 
   try {
     await UserModal.findOneAndUpdate({ name }, { $set: { isAdmin: false } });
 
-    interaction.reply(`**${existingUser.name}** has been demoted as an admin.`);
+    const modRole = interaction.guild?.roles.cache.find(
+      (r) => r.name === DiscordRoles.mod
+    );
+    const member = interaction.guild?.members.cache.find(
+      (member) => member.user.username === user.username
+    );
+
+    if (modRole && member) {
+      member.roles.remove(modRole);
+      interaction.reply(
+        `**${existingUser.name}** has been demoted as an admin.`
+      );
+    } else {
+      interaction.reply(
+        "Something went wrong while removing the roles for user"
+      );
+    }
   } catch (e: any) {
     console.log(e);
     interaction.reply(
-      `Sorry, something went wrong while storing your user data. Share this error with our developers to help you: "${e}"`
+      `Error: Sorry, something went wrong while storing your user data. Share this error with our developers to help you: "${e}"`
     );
   }
 };

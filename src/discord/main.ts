@@ -3,6 +3,8 @@ import { Client, GatewayIntentBits, Events } from "discord.js";
 import path from "path";
 import fs from "fs";
 import { DiscordClient } from "../types/client";
+import { DiscordRoles } from "../models/enums/discordRoles";
+import UserModal from "../models/user";
 
 export const initDiscord = () => {
   console.log("Welcome. Firing up!");
@@ -27,7 +29,7 @@ export const initDiscord = () => {
       .filter((file) => file.endsWith(".ts"));
     for (const file of commandFiles) {
       const filePath = path.join(commandsPath, file);
-      console.log(">", filePath);
+      console.log("Reading", filePath, "...");
       const command = require(filePath) as {
         data: Function;
         execute: Function;
@@ -51,7 +53,7 @@ export const initDiscord = () => {
     if (!interaction.isChatInputCommand()) {
       return;
     }
-    console.log("Interaction", interaction);
+
     const client = interaction.client as DiscordClient;
     const command = client.commands.get(interaction.commandName);
 
@@ -66,15 +68,34 @@ export const initDiscord = () => {
       console.error(e);
       if (interaction.replied || interaction.deferred) {
         await interaction.followUp({
-          content: "Sorry, something went wrong while executing this command.",
-          ephemeral: true,
+          content:
+            "Error: Sorry, something went wrong while executing this command.",
         });
       } else {
         await interaction.reply({
-          content: "Sorry, something went wrong while executing this command.",
-          ephemeral: true,
+          content:
+            "Error: Sorry, something went wrong while executing this command.",
         });
       }
+    }
+  });
+
+  client.on("guildMemberUpdate", (oldMember, newMember) => {
+    const name = newMember.user.username;
+    const wasMod = oldMember.roles.cache.find(
+      (r) => r.name === DiscordRoles.mod
+    );
+
+    const isNowMod = newMember.roles.cache.find(
+      (r) => r.name === DiscordRoles.mod
+    );
+
+    if (wasMod && !isNowMod) {
+      UserModal.findOneAndUpdate({ name }, { $set: { isAdmin: false } });
+    }
+
+    if (isNowMod && !wasMod) {
+      UserModal.findOneAndUpdate({ name }, { $set: { isAdmin: true } });
     }
   });
 

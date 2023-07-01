@@ -24,15 +24,16 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
 
   if (!mognoUser || !user) {
     return interaction.reply(
-      "Looks like this user isn't registered yet. We have no info about them."
+      "Error: Looks like this user isn't registered yet. We have no info about them."
     );
   }
 
-  const { id, discordId, name, points, rank, createdAt } = mognoUser;
+  const { id, discordId, name, points, rank, createdAt, isAdmin } = mognoUser;
 
   interaction.reply(`
       Here's the info that we know about **${name}**:
   
+      ${isAdmin ? "-Admin" : ""}
       -ID: ${discordId}
       -Points: ${points}
       -Rank: ${rank}

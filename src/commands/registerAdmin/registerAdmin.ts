@@ -6,6 +6,7 @@ import {
 } from "discord.js";
 import UserModal from "../../models/user";
 import { Ranks } from "../../models/enums/ranks";
+import { DiscordRoles } from "../../models/enums/discordRoles";
 
 const data = new SlashCommandBuilder()
   .setName("reg-admin")
@@ -28,13 +29,13 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
 
   if (password !== _password) {
     return interaction.reply(
-      "Incorrect password. This command is only available for admins"
+      "Error: Incorrect password. This command is only available for admins"
     );
   }
 
   if (!user) {
     return interaction.reply(
-      "Sorry, someting went wrong and we can't process this user at this time."
+      "Error: Sorry, someting went wrong and we can't process this user at this time."
     );
   }
 
@@ -43,7 +44,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
 
   if (userExist) {
     return interaction.reply(
-      `A user with the name of **${name}** already exists. Use **/make-admin** instead, to promote an already registered member to an admin.`
+      `Error: A user with the name of **${name}** already exists. Use **/make-admin** instead, to promote an already registered member to an admin.`
     );
   }
 
@@ -56,13 +57,27 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
       discordId: user.id,
     });
 
-    interaction.reply(
-      `You have been successfully registered as as an admin, your name is: **${createdUser.name}**. You will need this name for most things, try to remember it. This is your ID: **${createdUser.id}**`
+    const modRole = interaction.guild?.roles.cache.find(
+      (r) => r.name === DiscordRoles.mod
     );
+    const member = interaction.guild?.members.cache.find(
+      (member) => member.user.username === user.username
+    );
+
+    if (modRole && member) {
+      member.roles.add(modRole);
+      interaction.reply(
+        `You have been successfully registered as as an admin, your name is: **${createdUser.name}**. You will need this name for most things, try to remember it. This is your ID: **${createdUser.id}**`
+      );
+    } else {
+      interaction.reply(
+        "Something went wrong while assigning the roles for user. You might be missing the correct roles"
+      );
+    }
   } catch (e: any) {
     console.log(e);
     interaction.reply(
-      `Sorry, something went wrong while storing your user data. Share this error with our developers to help you: "${e}"`
+      `Error: Sorry, something went wrong while storing your user data. Share this error with our developers to help you: "${e}"`
     );
   }
 };
