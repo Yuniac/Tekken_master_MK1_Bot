@@ -3,6 +3,8 @@ import { Client, GatewayIntentBits, Events } from "discord.js";
 import path from "path";
 import fs from "fs";
 import { DiscordClient } from "../types/client";
+import { DiscordRoles } from "../models/enums/discordRoles";
+import UserModal from "../models/user";
 
 export const initDiscord = () => {
   console.log("Welcome. Firing up!");
@@ -75,6 +77,25 @@ export const initDiscord = () => {
             "Error: Sorry, something went wrong while executing this command.",
         });
       }
+    }
+  });
+
+  client.on("guildMemberUpdate", (oldMember, newMember) => {
+    const name = newMember.user.username;
+    const wasMod = oldMember.roles.cache.find(
+      (r) => r.name === DiscordRoles.mod
+    );
+
+    const isNowMod = newMember.roles.cache.find(
+      (r) => r.name === DiscordRoles.mod
+    );
+
+    if (wasMod && !isNowMod) {
+      UserModal.findOneAndUpdate({ name }, { $set: { isAdmin: false } });
+    }
+
+    if (isNowMod && !wasMod) {
+      UserModal.findOneAndUpdate({ name }, { $set: { isAdmin: true } });
     }
   });
 
