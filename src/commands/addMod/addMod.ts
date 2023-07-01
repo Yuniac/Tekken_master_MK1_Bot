@@ -5,15 +5,14 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 import UserModal from "../../models/user";
-import { Ranks } from "../../models/enums/ranks";
 
 const data = new SlashCommandBuilder()
-  .setName("reg-admin")
-  .setDescription("Register a user as an admin")
+  .setName("make-admin")
+  .setDescription("Upgrades a user to an admin")
   .addUserOption((option) =>
     option
       .setName("name")
-      .setDescription("Enter your unique user name to be registered with")
+      .setDescription("The user name to make admin")
       .setRequired(true)
   )
   .addStringOption((option) =>
@@ -39,26 +38,24 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
   }
 
   const name = user.username;
-  const userExist = await UserModal.findOne({ name });
+  const existingUser = await UserModal.findOne({ name });
 
-  if (userExist) {
+  if (!existingUser) {
     return interaction.reply(
-      `A user with the name of **${name}** already exists. Use **/make-admin** instead, to promote an already registered member to an admin.`
+      `There's no registered user with the name **${name}**. User must be registered before they can be made an admin.`
+    );
+  }
+
+  if (existingUser && existingUser.isAdmin === true) {
+    return interaction.reply(
+      `User **${name}** is an admin already. To demote them, use **/remove-admin** instead.`
     );
   }
 
   try {
-    const createdUser = await UserModal.create({
-      name,
-      isAdmin: true,
-      points: 1500,
-      rank: Ranks.unranked,
-      discordId: user.id,
-    });
+    await UserModal.findOneAndUpdate({ name }, { $set: { isAdmin: true } });
 
-    interaction.reply(
-      `You have been successfully registered as as an admin, your name is: **${createdUser.name}**. You will need this name for most things, try to remember it. This is your ID: **${createdUser.id}**`
-    );
+    interaction.reply(`**${existingUser.name}** has been made an admin.`);
   } catch (e: any) {
     console.log(e);
     interaction.reply(

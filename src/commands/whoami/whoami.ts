@@ -20,10 +20,10 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
     );
   }
 
-  const { id, discordId, name, points, rank } = mognoUser;
+  const { id, discordId, name, points, rank, isAdmin } = mognoUser;
 
   interaction.reply(`
-    Hey, **${name}**.
+    Hey, **${name}**. ${isAdmin ? `You are an admin.` : ""}
 
     -ID: ${discordId}
     -Points: ${points}
