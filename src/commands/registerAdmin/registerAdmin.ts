@@ -6,6 +6,7 @@ import {
 } from "discord.js";
 import UserModal from "../../models/user";
 import { Ranks } from "../../models/enums/ranks";
+import { DiscordRoles } from "../../models/enums/discordRoles";
 
 const data = new SlashCommandBuilder()
   .setName("reg-admin")
@@ -56,9 +57,23 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
       discordId: user.id,
     });
 
-    interaction.reply(
-      `You have been successfully registered as as an admin, your name is: **${createdUser.name}**. You will need this name for most things, try to remember it. This is your ID: **${createdUser.id}**`
+    const modRole = interaction.guild?.roles.cache.find(
+      (r) => r.name === DiscordRoles.mod
     );
+    const member = interaction.guild?.members.cache.find(
+      (member) => member.user.username === user.username
+    );
+
+    if (modRole && member) {
+      member.roles.add(modRole);
+      interaction.reply(
+        `You have been successfully registered as as an admin, your name is: **${createdUser.name}**. You will need this name for most things, try to remember it. This is your ID: **${createdUser.id}**`
+      );
+    } else {
+      interaction.reply(
+        "Something went wrong while assigning the roles for user. You might be missing the correct roles"
+      );
+    }
   } catch (e: any) {
     console.log(e);
     interaction.reply(

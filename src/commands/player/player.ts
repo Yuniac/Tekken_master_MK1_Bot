@@ -28,11 +28,12 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
     );
   }
 
-  const { id, discordId, name, points, rank, createdAt } = mognoUser;
+  const { id, discordId, name, points, rank, createdAt, isAdmin } = mognoUser;
 
   interaction.reply(`
       Here's the info that we know about **${name}**:
   
+      ${isAdmin ? "-Admin" : ""}
       -ID: ${discordId}
       -Points: ${points}
       -Rank: ${rank}

@@ -66,13 +66,13 @@ export const initDiscord = () => {
       console.error(e);
       if (interaction.replied || interaction.deferred) {
         await interaction.followUp({
-          content: "Sorry, something went wrong while executing this command.",
-          ephemeral: true,
+          content:
+            "Error: Sorry, something went wrong while executing this command.",
         });
       } else {
         await interaction.reply({
-          content: "Sorry, something went wrong while executing this command.",
-          ephemeral: true,
+          content:
+            "Error: Sorry, something went wrong while executing this command.",
         });
       }
     }

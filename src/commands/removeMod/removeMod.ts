@@ -5,6 +5,7 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 import UserModal from "../../models/user";
+import { DiscordRoles } from "../../models/enums/discordRoles";
 
 const data = new SlashCommandBuilder()
   .setName("remove-admin")
@@ -55,7 +56,23 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
   try {
     await UserModal.findOneAndUpdate({ name }, { $set: { isAdmin: false } });
 
-    interaction.reply(`**${existingUser.name}** has been demoted as an admin.`);
+    const modRole = interaction.guild?.roles.cache.find(
+      (r) => r.name === DiscordRoles.mod
+    );
+    const member = interaction.guild?.members.cache.find(
+      (member) => member.user.username === user.username
+    );
+
+    if (modRole && member) {
+      member.roles.remove(modRole);
+      interaction.reply(
+        `**${existingUser.name}** has been demoted as an admin.`
+      );
+    } else {
+      interaction.reply(
+        "Something went wrong while removing the roles for user"
+      );
+    }
   } catch (e: any) {
     console.log(e);
     interaction.reply(

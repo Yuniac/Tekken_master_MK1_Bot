@@ -27,6 +27,11 @@ const UserSchema = new Schema(
       required: true,
       type: String,
     },
+    // Is Tekken Master = root
+    isTM: {
+      required: false,
+      type: Boolean,
+    },
   },
   {
     timestamps: true,
