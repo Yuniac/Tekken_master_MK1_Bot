@@ -6,8 +6,8 @@ import {
 import UserModal from "../../models/user";
 
 const data = new SlashCommandBuilder()
-  .setName("whoami")
-  .setDescription("Gets info about yourself");
+  .setName("myself")
+  .setDescription("Get info about yourself");
 
 const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
   const mognoUser = await UserModal.findOne({

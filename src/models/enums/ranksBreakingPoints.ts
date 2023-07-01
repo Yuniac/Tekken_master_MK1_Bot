@@ -1,4 +1,4 @@
-export enum RanksPoints {
+export enum RanksBreakingPoints {
   mk_expret = 2200,
   high_pro = 2000,
   pro = 1800,
