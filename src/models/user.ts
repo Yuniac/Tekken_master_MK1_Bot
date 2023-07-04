@@ -17,6 +17,7 @@ const UserSchema = new Schema(
       required: false,
       type: String,
       enum: Ranks,
+      default: Ranks.unranked,
     },
     isAdmin: {
       required: false,

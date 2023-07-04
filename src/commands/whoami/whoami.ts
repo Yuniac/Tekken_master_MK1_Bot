@@ -4,15 +4,29 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 import UserModal from "../../models/user";
+import MatchModal from "../../models/match";
+import { PlayerHelper } from "../../helpers/player.helper";
+import { MongooseUser } from "../../types/mongoose/User";
 
 const data = new SlashCommandBuilder()
-  .setName("whoami")
-  .setDescription("Gets info about yourself");
+  .setName("myself")
+  .setDescription("Get info about yourself");
 
 const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
-  const mognoUser = await UserModal.findOne({
-    discordId: interaction.user.id,
-  });
+  const userId = interaction.user.id;
+  const userName = interaction.user.username;
+
+  const [mognoUser, matchesCount, matchesWonByUser] = await Promise.all([
+    UserModal.findOne({
+      discordId: userId,
+    }),
+    MatchModal.countDocuments({
+      $or: [{ player1Name: userName }, { player2Name: userName }],
+    }),
+    MatchModal.countDocuments({ winner: userName }),
+  ]);
+
+  const winRate = (matchesWonByUser * 100) / matchesCount;
 
   if (!mognoUser) {
     return interaction.reply(
@@ -20,15 +34,16 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
     );
   }
 
-  const { id, discordId, name, points, rank, isAdmin } = mognoUser;
-
-  interaction.reply(`
-    Hey, **${name}**. ${isAdmin ? `You are an admin.` : ""}
-
-    -ID: ${discordId}
-    -Points: ${points}
-    -Rank: ${rank}
-  `);
+  interaction.reply(
+    PlayerHelper.getInfo(
+      mognoUser as unknown as MongooseUser,
+      {
+        matchesCount,
+        winRate,
+      },
+      true
+    )
+  );
 };
 
 export { data, execute };

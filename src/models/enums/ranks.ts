@@ -1,10 +1,10 @@
 export enum Ranks {
-  mk_expret = "MK Expret",
-  high_pro = "High Pro",
-  pro = "Pro",
-  semi_pro = "Semi-Pro",
-  medium = "Medium",
-  amateur = "Amateur",
-  noob = "Noob",
-  unranked = "Unranked",
+  unranked = "unranked",
+  noob = "noob",
+  amateur = "amateur",
+  medium = "medium",
+  semi_pro = "semi_pro",
+  pro = "pro",
+  high_pro = "high_pro",
+  mk_expert = "mk_expert",
 }

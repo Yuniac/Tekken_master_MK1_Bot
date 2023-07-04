@@ -5,6 +5,7 @@ import fs from "fs";
 import { DiscordClient } from "../types/client";
 import { DiscordRoles } from "../models/enums/discordRoles";
 import UserModal from "../models/user";
+import { RanksBreakingPoints } from "../models/enums/ranksBreakingPoints";
 
 export const initDiscord = () => {
   console.log("Welcome. Firing up!");
@@ -59,6 +60,9 @@ export const initDiscord = () => {
 
     if (!command) {
       console.error(`No command matching ${interaction.commandName} was found`);
+      interaction.reply(
+        `Error: We couldn't understand **${interaction.commandName}**. This command is unknown`
+      );
       return;
     }
 
