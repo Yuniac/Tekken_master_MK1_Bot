@@ -29,7 +29,7 @@ export class MatchHelper {
     }
 
     // if the points were less than nothing, then return the highest rank we have
-    return Ranks[Ranks.mk_expret];
+    return Ranks[Ranks.mk_expert];
   }
 
   // This would only run when both are unranked. For every other case, see `CheckIfPlayerHasRankedUpOrDown`
@@ -79,6 +79,7 @@ export class MatchHelper {
     interaction: ChatInputCommandInteraction<CacheType>
   ) {}
 
+  // :[winnerPoints, loserPoints]
   static calculatePointsWonAndLostInMatch(
     winner: MongooseUser,
     loser: MongooseUser
@@ -96,24 +97,22 @@ export class MatchHelper {
 
     if (winnerRankIndex === loserRankIndex) {
       player1Points = base;
-      player2Points = base;
+      player2Points = -base;
     } else {
       const bigger = Math.max(winnerRankIndex, loserRankIndex);
       const smaller = Math.min(winnerRankIndex, loserRankIndex);
+
       const difference = bigger - smaller;
 
-      // TODO the math here isnt 100%
       if (winnerRankIndex === bigger) {
         player1Points = base - difference;
+        player2Points = base - difference;
       } else {
         player1Points = base + difference;
+        player2Points = base + difference;
       }
 
-      if (loserRankIndex === bigger) {
-        player2Points = base + difference;
-      } else {
-        player2Points = base - difference;
-      }
+      player2Points = -player2Points;
     }
 
     return [player1Points, player2Points];

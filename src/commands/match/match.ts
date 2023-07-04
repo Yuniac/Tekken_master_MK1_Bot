@@ -92,7 +92,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
       ),
       UserModal.findOneAndUpdate(
         { name: user.username },
-        { $inc: { points: -pointsLost } }
+        { $inc: { points: pointsLost } }
       ),
       MatchHelper.CheckIfPlayerGainedARank(
         existingOpponent,

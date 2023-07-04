@@ -5,5 +5,5 @@ export enum RanksBreakingPoints {
   semi_pro = 1600,
   pro = 1800,
   high_pro = 2000,
-  mk_expret = 2200,
+  mk_expert = 2200,
 }

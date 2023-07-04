@@ -6,5 +6,5 @@ export enum Ranks {
   semi_pro = "semi_pro",
   pro = "pro",
   high_pro = "high_pro",
-  mk_expret = "mk_expret",
+  mk_expert = "mk_expert",
 }
