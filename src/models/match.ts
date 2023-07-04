@@ -42,6 +42,11 @@ const MatchSchema = new Schema(
       type: String,
       enum: Ranks,
     },
+    season: {
+      required: false,
+      type: String,
+      default: 1,
+    },
   },
   {
     timestamps: true,
