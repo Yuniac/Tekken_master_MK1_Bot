@@ -47,7 +47,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
 
   if (user.id === opponent.id) {
     return interaction.reply(
-      "Error: You can't report yourself as a winner. Reporting is done by via losers. For help, contact the moderators"
+      "Error: You can't report yourself as a winner. Reporting is done by the loser. For help, contact the moderators"
     );
   }
 
@@ -74,7 +74,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
     existingUser,
     existingOpponent
   );
-  console.log(pointsWon, pointsLost);
+
   try {
     await Promise.all([
       MatchModal.create({
@@ -103,10 +103,8 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
 
     interaction.reply(
       // `Match results between ${userMention(opponent.id)} and ${userMention(
-      `The best of 5 set between ${opponent.username} and ${
-        user.username
-      } have ended. ${opponent.username} has won ${
-        winnersScrore && losersScore ? `${winnersScrore}-${losersScore}` : ""
+      `${opponent.username} defeated ${user.username} in a best of 5 set ${
+        winnersScrore && losersScore ? `(${winnersScrore}-${losersScore})` : ""
       }, GGs`
     );
   } catch (e: any) {
