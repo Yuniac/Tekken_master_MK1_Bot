@@ -70,10 +70,14 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
     );
   }
 
-  const [pointsWon, pointsLost] = MatchHelper.calculatePointsWonAndLostInMatch(
-    existingUser,
-    existingOpponent
-  );
+  const [winnerDiffPoints, loserDiffPoints] =
+    MatchHelper.calculateNewPointsOfWinnerAndLoser(
+      existingOpponent,
+      existingUser
+    );
+
+  const pointsWon = winnerDiffPoints - existingOpponent.points;
+  const pointsLost = loserDiffPoints - existingUser.points;
 
   try {
     await Promise.all([

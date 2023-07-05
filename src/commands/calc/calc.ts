@@ -48,26 +48,27 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
       );
     }
 
-    const ifPlayerWin = MatchHelper.calculatePointsWonAndLostInMatch(
+    const ifPlayerWins = MatchHelper.calculateNewPointsOfWinnerAndLoser(
       mongoUser as unknown as MongooseUser,
       mongoOpponent as unknown as MongooseUser
     );
-    const ifPlayerLose = MatchHelper.calculatePointsWonAndLostInMatch(
+
+    const ifPlayerLoses = MatchHelper.calculateNewPointsOfWinnerAndLoser(
       mongoOpponent as unknown as MongooseUser,
       mongoUser as unknown as MongooseUser
     );
 
     interaction.reply(`
-    VS **${opponent.username}**. Their rank is: **${mongoOpponent.rank}**, your rank is: **${mongoUser.rank}**
+    VS **${opponent.username}**. Their points: **${
+      mongoOpponent.points
+    }**, your points: **${mongoUser.points}**
 
     If you win against **${opponent.username}**:
-        -You gain: **+${ifPlayerWin[0]}** points
-        -They lose: **${ifPlayerWin[1]}** points
+        -You gain: **+${ifPlayerWins[0] - mongoUser.points}** points
 
 
     If you lose against **${opponent.username}**:
-        -You lose: **${ifPlayerLose[1]}** points
-        -They gain: **+${ifPlayerLose[0]}** points
+        -You lose: **${mongoOpponent.points - ifPlayerLoses[0]}** points
     `);
   } catch (e: any) {
     console.log(e);

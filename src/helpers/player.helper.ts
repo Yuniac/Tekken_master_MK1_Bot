@@ -18,12 +18,11 @@ export class PlayerHelper {
         : `Here's the info that we know about **${name}**:`
     }
 
-    -ID: **${discordId}**
     -Points: **${points}**
     -Rank: **${StringHelper.humanize(rank)}**
-    -Registered at: **${format(new Date(createdAt), "dd-MM-Y K:a")}**
-    -Matches played: **${matchesCount}**
-    ${winRate ? `-Average win rate: **${Math.round(winRate!)}%**` : ""}
+    -Registered at: **${format(new Date(createdAt), "dd-MM-Y")}**
+    -Sets played: **${matchesCount}**
+    ${winRate ? `-Win rate: **${Math.round(winRate!)}%**` : ""}
   `;
   }
 }

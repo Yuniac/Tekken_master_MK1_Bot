@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, CacheType, User } from "discord.js";
+import { ChatInputCommandInteraction, CacheType } from "discord.js";
 import MatchModal from "../models/match";
 import UserModal from "../models/user";
 import { Ranks } from "../models/enums/ranks";
@@ -8,6 +8,13 @@ import { RanksBreakingPoints } from "../models/enums/ranksBreakingPoints";
 export class MatchHelper {
   // static numOfMatchesToGetARank = 10;
   static numOfMatchesToGetARank = 3;
+  static basePoints = [10, 10, 10, 8, 8, 8, 5];
+  static pointsCalcBase = 30;
+  // TODO Change number of matches needed to 5, instead of 10. to gain a rank
+  // TODO change they gain and lose
+  // remove pong
+  // TODO sends a report
+  //
 
   static getRankBasedOnPoints(points: number): Ranks {
     // TS compiler duplicates the value of an enum, this gets only the half
@@ -61,14 +68,12 @@ export class MatchHelper {
     if (player1CanHaveARankNow) {
       const points = player1.points;
       const rank = MatchHelper.getRankBasedOnPoints(points);
-      console.log(rank);
       await UserModal.updateOne({ name: player1.name }, { $set: { rank } });
     }
 
     if (player2CanHaveARankNow) {
       const points = player2.points;
       const rank = MatchHelper.getRankBasedOnPoints(points);
-      console.log(rank);
       await UserModal.updateOne({ name: player2.name }, { $set: { rank } });
     }
   }
@@ -79,42 +84,36 @@ export class MatchHelper {
     interaction: ChatInputCommandInteraction<CacheType>
   ) {}
 
-  // :[winnerPoints, loserPoints]
-  static calculatePointsWonAndLostInMatch(
+  static calculateNewPointsOfWinnerAndLoser(
     winner: MongooseUser,
     loser: MongooseUser
   ): [number, number] {
-    const winnerRank = winner.rank;
-    const loserRank = loser.rank;
-    const ranksInOrder = Object.keys(Ranks);
+    const winnerPoints = winner.points;
+    const loserPoints = loser.points;
 
-    let player1Points = 0,
-      player2Points = 0;
-    const base = 10;
+    let player1Probability = MatchHelper.CalculateProbability(
+      loser.points,
+      winner.points
+    );
+    let player2Probability = MatchHelper.CalculateProbability(
+      winner.points,
+      loser.points
+    );
 
-    const winnerRankIndex = ranksInOrder.findIndex((r) => r === winnerRank);
-    const loserRankIndex = ranksInOrder.findIndex((r) => r === loserRank);
+    let player1Result, player2Result;
 
-    if (winnerRankIndex === loserRankIndex) {
-      player1Points = base;
-      player2Points = -base;
-    } else {
-      const bigger = Math.max(winnerRankIndex, loserRankIndex);
-      const smaller = Math.min(winnerRankIndex, loserRankIndex);
+    player1Result =
+      winnerPoints + MatchHelper.pointsCalcBase * (1 - player1Probability);
+    player2Result =
+      loserPoints + MatchHelper.pointsCalcBase * (0 - player2Probability);
 
-      const difference = bigger - smaller;
+    return [Math.round(player1Result), Math.round(player2Result)];
+  }
 
-      if (winnerRankIndex === bigger) {
-        player1Points = base - difference;
-        player2Points = base - difference;
-      } else {
-        player1Points = base + difference;
-        player2Points = base + difference;
-      }
-
-      player2Points = -player2Points;
-    }
-
-    return [player1Points, player2Points];
+  static CalculateProbability(winnerPoints: number, loserPoints: number) {
+    return (
+      (1.0 * 1.0) /
+      (1 + 1.0 * Math.pow(10, (1.0 * (winnerPoints - loserPoints)) / 400))
+    );
   }
 }
