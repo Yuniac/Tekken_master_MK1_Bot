@@ -30,7 +30,7 @@ jobs:
         run: yarn
 
   deploy:
-    runs-on: Ubuntu 22.04.2
+    runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
