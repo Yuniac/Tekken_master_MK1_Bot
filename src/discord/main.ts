@@ -8,7 +8,7 @@ import UserModal from "../models/user";
 import { RanksBreakingPoints } from "../models/enums/ranksBreakingPoints";
 
 export const initDiscord = () => {
-  console.log("Welcome. Firing the bot up!");
+  console.log("Welcome. Firing up!");
   console.log("Loading...");
 
   const client = new Client({
