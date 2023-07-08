@@ -30,7 +30,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
 
   if (!mognoUser) {
     return interaction.reply(
-      "Looks like you aren't registered yet. Use **/reg** to start your journy!"
+      "Looks like you aren't registered yet! Use **/reg** to start your journy!"
     );
   }
 

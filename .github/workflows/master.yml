@@ -47,7 +47,6 @@ jobs:
           username: ${{ secrets.username }}
           key: ${{ secrets.ssh_key }}
           script: |
-            kill 689
             cd "../home/Tekken_master_MK1_Bot/"
             git fetch && git pull
             yarn
