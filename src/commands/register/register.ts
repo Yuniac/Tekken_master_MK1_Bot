@@ -36,13 +36,11 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
       `A user with the name of **${user.username}** already exists. Please choose a different name.`
     );
   }
-  const isAnAdminRegisteringSomeone =
-    embeddedUserAsMongoUser?.isAdmin === true &&
-    embeddedUser.username !== user.username;
+  const isSelfRegistery = embeddedUser.username !== user.username;
 
-  if (!isAnAdminRegisteringSomeone) {
+  if (!isSelfRegistery) {
     return interaction.reply(
-      `Error: You can only register yourself. Only admins can register anyone.`
+      `Error: You can only register yourself. You entered ${user.username}`
     );
   }
 
