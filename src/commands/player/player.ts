@@ -34,7 +34,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
 
   if (!mognoUser || !user) {
     return interaction.reply(
-      "Error: Looks like this user isn't registered yet. We have no info about them."
+      `Error: Looks like this user (**${user?.username}**) isn't registered yet. We have no info about them.`
     );
   }
 
