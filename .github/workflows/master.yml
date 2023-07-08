@@ -29,6 +29,19 @@ jobs:
 
         run: yarn
 
-    #   - name: Start server
+  deploy:
+    runs-on: Ubuntu 22.04.2
 
-    #     run: yarn start
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: Rebuild the bot
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.host }}
+          username: ${{ secrets.username }}
+          script: cd ../home/Tekken_master_MK1_Bot/
+            git fetch && git pull
+            yarn
+            yarn start
