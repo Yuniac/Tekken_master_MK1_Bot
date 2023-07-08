@@ -50,4 +50,3 @@ jobs:
             cd "../home/Tekken_master_MK1_Bot/"
             git fetch && git pull
             yarn
-            yarn start
