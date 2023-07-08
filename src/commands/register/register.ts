@@ -37,7 +37,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
 
   if (!isSelfRegistery) {
     return interaction.reply(
-      `Error: You can only register yourself. You entered ${user.username}`
+      `Error: You can only register yourself. You entered username **${user.username}**`
     );
   }
 
@@ -52,7 +52,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
 
     const response = `You have been successfully registered as a player, your name is: **${createdUser.name}**. You will need this name for most things, try to remember it. This is your ID: **${createdUser.id}**.
 
-    If you ever need to see your info, use **/whoami**.
+    If you ever need to see your info, use **/myself**.
   `;
     interaction.reply(response);
   } catch (e: any) {
