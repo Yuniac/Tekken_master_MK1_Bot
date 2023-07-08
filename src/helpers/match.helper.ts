@@ -1,9 +1,16 @@
-import { ChatInputCommandInteraction, CacheType } from "discord.js";
+import {
+  ChatInputCommandInteraction,
+  CacheType,
+  TextChannel,
+} from "discord.js";
 import MatchModal from "../models/match";
 import UserModal from "../models/user";
 import { Ranks } from "../models/enums/ranks";
 import { MongooseUser } from "../types/mongoose/User";
 import { RanksBreakingPoints } from "../models/enums/ranksBreakingPoints";
+import { ChannelIds } from "../models/enums/channelIDs";
+import { StringHelper } from "./String.helper";
+import { format } from "date-fns";
 
 export class MatchHelper {
   // static numOfMatchesToGetARank = 10;
@@ -12,7 +19,6 @@ export class MatchHelper {
   static pointsCalcBase = 30;
   // TODO Change number of matches needed to 5, instead of 10. to gain a rank
   // TODO change they gain and lose
-  // remove pong
   // TODO sends a report
   //
 
@@ -110,10 +116,36 @@ export class MatchHelper {
     return [Math.round(player1Result), Math.round(player2Result)];
   }
 
-  static CalculateProbability(winnerPoints: number, loserPoints: number) {
+  private static CalculateProbability(
+    winnerPoints: number,
+    loserPoints: number
+  ) {
     return (
       (1.0 * 1.0) /
       (1 + 1.0 * Math.pow(10, (1.0 * (winnerPoints - loserPoints)) / 400))
     );
+  }
+
+  static sendNotificationToBattleLogChannel(
+    winner: MongooseUser,
+    loser: MongooseUser,
+    pointsWon: number,
+    pointsLost: number,
+    interactions: ChatInputCommandInteraction<CacheType>
+  ) {
+    const battleLogChannel = interactions.client.channels.cache.get(
+      ChannelIds.battleLog
+    );
+
+    if (battleLogChannel) {
+      const channel = battleLogChannel as TextChannel;
+      channel.sendTyping();
+      const message = `${format(new Date(), "dd-MM-Y K:a")}
+      
+        ${winner.name} (${winner.points})+${pointsWon} defeated ${
+        loser.name
+      } (${loser.points})-${pointsLost}
+      `;
+    }
   }
 }

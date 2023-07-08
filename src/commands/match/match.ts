@@ -78,7 +78,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
   const pointsLost = loserDiffPoints - existingUser.points;
 
   try {
-    await Promise.all([
+    const [_, updatedWinner, updatedLoser] = await Promise.all([
       MatchModal.create({
         winner: opponent.username,
         player1Name: opponent.username,
@@ -102,6 +102,14 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
         interaction
       ),
     ]);
+
+    MatchHelper.sendNotificationToBattleLogChannel(
+      updatedWinner as unknown as MongooseUser,
+      updatedLoser as unknown as MongooseUser,
+      pointsWon,
+      pointsLost,
+      interaction
+    );
 
     interaction.reply(
       // `Match results between ${userMention(opponent.id)} and ${userMention(
