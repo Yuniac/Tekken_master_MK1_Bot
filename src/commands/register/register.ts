@@ -26,17 +26,14 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
     );
   }
 
-  const [existingUser, embeddedUserAsMongoUser] = await Promise.all([
-    UserModal.findOne({ name: user.username }),
-    UserModal.findOne({ name: embeddedUser.username }),
-  ]);
+  const existingUser = await UserModal.findOne({ name: user.username });
 
   if (existingUser) {
     return interaction.reply(
       `A user with the name of **${user.username}** already exists. Please choose a different name.`
     );
   }
-  const isSelfRegistery = embeddedUser.username !== user.username;
+  const isSelfRegistery = embeddedUser.username === user.username;
 
   if (!isSelfRegistery) {
     return interaction.reply(
