@@ -46,7 +46,8 @@ jobs:
           host: ${{ secrets.host }}
           username: ${{ secrets.username }}
           key: ${{ secrets.ssh_key }}
-          script: cd ../home/Tekken_master_MK1_Bot/
+          script: 
+            cd ../home/Tekken_master_MK1_Bot/
             git fetch && git pull
             yarn
             yarn start
