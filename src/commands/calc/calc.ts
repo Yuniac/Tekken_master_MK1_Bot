@@ -6,6 +6,7 @@ import {
 import UserModal from "../../models/user";
 import { MatchHelper } from "../../helpers/match.helper";
 import { MongooseUser } from "../../types/mongoose/User";
+import { StringHelper } from "../../helpers/String.helper";
 
 const data = new SlashCommandBuilder()
   .setName("calc")
@@ -57,16 +58,27 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
       mongoUser as unknown as MongooseUser
     );
 
-    interaction.reply(`
-    VS **${opponent.username}**(${mongoOpponent.points}pts):
+    const message = StringHelper.buildEmebd(
+      {
+        title: "Match preview:",
+        description: `VS **${opponent.username}** (${mongoOpponent.points} points):`,
+        fields: [
+          {
+            name: "If you win a set:",
+            value: `+${String(ifPlayerWins[0] - mongoUser.points)} points`,
+            inline: false,
+          },
+          {
+            name: "If you lose a set:",
+            value: `${String(mongoOpponent.points - ifPlayerLoses[0])} points`,
+            inline: false,
+          },
+        ],
+      },
+      interaction
+    );
 
-    If you win against **${opponent.username}**:
-        -You gain: **+${ifPlayerWins[0] - mongoUser.points}** pts
-
-
-    If you lose against **${opponent.username}**:
-        -You lose: **${mongoOpponent.points - ifPlayerLoses[0]}** pts
-    `);
+    interaction.reply({ embeds: [message] });
   } catch (e: any) {
     console.log(e);
     interaction.reply(

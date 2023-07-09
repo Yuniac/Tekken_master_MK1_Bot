@@ -8,7 +8,6 @@ import UserModal from "../../models/user";
 import MatchModal from "../../models/match";
 import { MatchHelper } from "../../helpers/match.helper";
 import { MongooseUser } from "../../types/mongoose/User";
-import { isNumber } from "lodash";
 
 const data = new SlashCommandBuilder()
   .setName("m")
@@ -114,6 +113,8 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
       updatedLoser as unknown as MongooseUser,
       pointsWon,
       pointsLost,
+      winnersScrore,
+      losersScore,
       interaction
     );
 
@@ -123,10 +124,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
       }(+${pointsWon}) defeated **${userMention(user.id)}** ${
         updatedLoser?.points
       }(${pointsLost}) in a best of 5 set${
-        isNumber(winnersScrore) &&
-        winnersScrore >= 0 &&
-        isNumber(losersScore) &&
-        losersScore >= 0
+        MatchHelper.canDisplayScores(winnersScrore, losersScore)
           ? ` (${winnersScrore}-${losersScore})`
           : ""
       }, GGs`

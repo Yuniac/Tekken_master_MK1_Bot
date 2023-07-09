@@ -1,3 +1,9 @@
+import {
+  CacheType,
+  ChatInputCommandInteraction,
+  EmbedBuilder,
+  EmbedField,
+} from "discord.js";
 import { capitalize } from "lodash";
 
 export class StringHelper {
@@ -16,5 +22,27 @@ export class StringHelper {
       .split(" ")
       .map((word) => capitalize(word))
       .join(" ");
+  }
+
+  static buildEmebd(
+    arg: {
+      title: string;
+      description: string;
+      fields?: EmbedField[];
+    },
+    interaction: ChatInputCommandInteraction<CacheType>
+  ) {
+    const { title, description, fields } = arg;
+
+    return new EmbedBuilder()
+      .setAuthor({
+        name: "Tekken Master Bot",
+        iconURL: interaction.client.user.avatarURL() || "",
+      })
+      .setColor("#9B59B6")
+      .setTitle(title)
+      .setDescription(description)
+      .setFooter({ text: "Tekken Master MK1 Ladder bot." })
+      .addFields(fields || []);
   }
 }

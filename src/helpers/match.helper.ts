@@ -2,14 +2,17 @@ import {
   ChatInputCommandInteraction,
   CacheType,
   TextChannel,
+  EmbedField,
 } from "discord.js";
 import MatchModal from "../models/match";
 import UserModal from "../models/user";
 import { Ranks } from "../models/enums/ranks";
 import { MongooseUser } from "../types/mongoose/User";
 import { RanksBreakingPoints } from "../models/enums/ranksBreakingPoints";
-import { ChannelIds } from "../models/enums/channelIDs";
 import { format } from "date-fns";
+import { isNumber } from "lodash";
+import { StringHelper } from "./String.helper";
+import { ChannelIds } from "../models/enums/channelIDs";
 
 export class MatchHelper {
   static numOfMatchesToGetARank = 5;
@@ -137,21 +140,63 @@ export class MatchHelper {
     loser: MongooseUser,
     pointsWon: number,
     pointsLost: number,
-    interactions: ChatInputCommandInteraction<CacheType>
+    winnerScore: number | null,
+    loserScore: number | null,
+    interaction: ChatInputCommandInteraction<CacheType>
   ) {
-    const battleLogChannel = interactions.client.channels.cache.get(
+    const battleLogChannel = interaction.client.channels.cache.get(
       ChannelIds.battleLog
     );
 
     if (battleLogChannel) {
       const channel = battleLogChannel as TextChannel;
       channel.sendTyping();
-      const message = `${format(new Date(), "dd-MM-Y K:a")}
+      const text = `${format(new Date(), "dd-MM-Y K:a")}
       
-        ${winner.name} (${winner.points})+${pointsWon} defeated ${
+      **${winner.name}** (${winner.points}) +${pointsWon} defeated **${
         loser.name
-      } (${loser.points})-${pointsLost}
+      }** (${loser.points}) ${pointsLost}
       `;
+
+      const builderArg: {
+        title: string;
+        description: string;
+        fields?: EmbedField[];
+      } = {
+        title: "New match report:",
+        description: text,
+      };
+
+      if (this.canDisplayScores(winnerScore, loserScore)) {
+        builderArg["fields"] = [
+          {
+            name: `${winner.name} score:`,
+            value: String(winnerScore),
+            inline: true,
+          },
+          {
+            name: `${loser.name} score:`,
+            value: String(loserScore),
+            inline: true,
+          },
+        ];
+      }
+
+      const message = StringHelper.buildEmebd(builderArg, interaction);
+
+      channel.send({ embeds: [message] });
     }
+  }
+
+  static canDisplayScores(
+    player1Score: number | null,
+    player2Score: number | null
+  ) {
+    return (
+      isNumber(player1Score) &&
+      player1Score >= 0 &&
+      isNumber(player2Score) &&
+      player2Score >= 0
+    );
   }
 }
