@@ -9,7 +9,7 @@ import { PlayerHelper } from "../../helpers/player.helper";
 import { MongooseUser } from "../../types/mongoose/User";
 
 const data = new SlashCommandBuilder()
-  .setName("myself")
+  .setName("myselfff")
   .setDescription("Get info about yourself");
 
 const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
