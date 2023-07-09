@@ -9,18 +9,12 @@ import { Ranks } from "../models/enums/ranks";
 import { MongooseUser } from "../types/mongoose/User";
 import { RanksBreakingPoints } from "../models/enums/ranksBreakingPoints";
 import { ChannelIds } from "../models/enums/channelIDs";
-import { StringHelper } from "./String.helper";
 import { format } from "date-fns";
 
 export class MatchHelper {
-  // static numOfMatchesToGetARank = 10;
-  static numOfMatchesToGetARank = 3;
+  static numOfMatchesToGetARank = 5;
   static basePoints = [10, 10, 10, 8, 8, 8, 5];
   static pointsCalcBase = 30;
-  // TODO Change number of matches needed to 5, instead of 10. to gain a rank
-  // TODO change they gain and lose
-  // TODO sends a report
-  //
 
   static getRankBasedOnPoints(points: number): Ranks {
     // TS compiler duplicates the value of an enum, this gets only the half
@@ -31,13 +25,25 @@ export class MatchHelper {
     for (let i = 0; i < ranks.length; i++) {
       const current = ranks[i];
       const next = ranks[i + 1];
-      if (next && points < next[1] && points >= current[1]) {
-        const first = Math.abs(current[1] - points);
-        const second = Math.abs(next[1] - points);
+      if (next) {
+        if (points >= current[1] && points < next[1]) {
+          return current[0] as Ranks;
 
-        const closest = first < second ? current[0] : next[0];
+          // Un-comment and use below, instead of above, to:
+          // get the cloest of two ranks instead of falling back to within one range.
+          // points: 1564
+          // method A) (used above) will grant the player `medium` by falling back from 1564-- till it reaches a number that has a rank
+          // which is, 1400 = medium
+          // method B) (used below) will grant the player `semi_pro` by finding the clost number to 1564, both searching forward and backward that has a rank, which is
+          // 1600 = medium
 
-        return closest as Ranks;
+          // const first = Math.abs(current[1] - points);
+          // const second = Math.abs(next[1] - points);
+
+          // const closest = first < second ? current[0] : next[0];
+
+          // return closest as Ranks;
+        }
       }
     }
 
