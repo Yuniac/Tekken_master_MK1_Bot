@@ -30,31 +30,18 @@ for (const folder of commandFolders) {
   }
 }
 
-// Construct and prepare an instance of the REST module
-console.log(process.env.discord_token);
 const api = new REST().setToken(process.env.discord_token!);
 
-// and deploy your commands!
 (async () => {
   try {
     console.log(
       `Started refreshing ${commands.length} application (/) commands.`
     );
 
-    // The put method is used to fully refresh all commands in the guild with the current set
     const data = await api.put(
       Routes.applicationGuildCommands(
         process.env.clientId!,
-        // ys guild
         process.env.guildId!
-      ),
-      { body: commands }
-    );
-    await api.put(
-      Routes.applicationGuildCommands(
-        process.env.clientId!,
-        // tekken master guild
-        "762263140208476170"
       ),
       { body: commands }
     );
@@ -63,7 +50,6 @@ const api = new REST().setToken(process.env.discord_token!);
       `Successfully reloaded ${(data as any).length} application (/) commands.`
     );
   } catch (error) {
-    // And of course, make sure you catch and log any errors!
     console.error(error);
   }
 })();
