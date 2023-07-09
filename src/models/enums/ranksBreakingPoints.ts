@@ -1,5 +1,5 @@
 export enum RanksBreakingPoints {
-  noob = 0,
+  beginner = 0,
   amateur = 1200,
   medium = 1400,
   semi_pro = 1600,

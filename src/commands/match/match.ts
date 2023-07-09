@@ -8,7 +8,6 @@ import {
 import UserModal from "../../models/user";
 import MatchModal from "../../models/match";
 import { MatchHelper } from "../../helpers/match.helper";
-import { Ranks } from "../../models/enums/ranks";
 import { MongooseUser } from "../../types/mongoose/User";
 
 const data = new SlashCommandBuilder()
@@ -108,7 +107,9 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
     interaction.reply(
       // `Match results between ${userMention(opponent.id)} and ${userMention(
       `${opponent.username} defeated ${user.username} in a best of 5 set ${
-        winnersScrore && losersScore ? `(${winnersScrore}-${losersScore})` : ""
+        winnersScrore && winnersScrore >= 0 && losersScore && losersScore >= 0
+          ? `(${winnersScrore}-${losersScore})`
+          : ""
       }, GGs`
     );
   } catch (e: any) {
