@@ -1,19 +1,23 @@
-import { ChatInputCommandInteraction, CacheType } from "discord.js";
+import {
+  ChatInputCommandInteraction,
+  CacheType,
+  TextChannel,
+  EmbedField,
+} from "discord.js";
 import MatchModal from "../models/match";
 import UserModal from "../models/user";
 import { Ranks } from "../models/enums/ranks";
 import { MongooseUser } from "../types/mongoose/User";
 import { RanksBreakingPoints } from "../models/enums/ranksBreakingPoints";
+import { format } from "date-fns";
+import { isNumber } from "lodash";
+import { StringHelper } from "./String.helper";
+import { ChannelIds } from "../models/enums/channelIDs";
 
 export class MatchHelper {
   static numOfMatchesToGetARank = 5;
   static basePoints = [10, 10, 10, 8, 8, 8, 5];
   static pointsCalcBase = 30;
-  // TODO Change number of matches needed to 5, instead of 10. to gain a rank
-  // TODO change they gain and lose
-  // remove pong
-  // TODO sends a report
-  //
 
   static getRankBasedOnPoints(points: number): Ranks {
     // TS compiler duplicates the value of an enum, this gets only the half
@@ -24,13 +28,25 @@ export class MatchHelper {
     for (let i = 0; i < ranks.length; i++) {
       const current = ranks[i];
       const next = ranks[i + 1];
-      if (next && points < next[1] && points >= current[1]) {
-        const first = Math.abs(current[1] - points);
-        const second = Math.abs(next[1] - points);
+      if (next) {
+        if (points >= current[1] && points < next[1]) {
+          return current[0] as Ranks;
 
-        const closest = first < second ? current[0] : next[0];
+          // Un-comment and use below, instead of above, to:
+          // get the cloest of two ranks instead of falling back to within one range.
+          // points: 1564
+          // method A) (used above) will grant the player `medium` by falling back from 1564-- till it reaches a number that has a rank
+          // which is, 1400 = medium
+          // method B) (used below) will grant the player `semi_pro` by finding the clost number to 1564, both searching forward and backward that has a rank, which is
+          // 1600 = medium
 
-        return closest as Ranks;
+          // const first = Math.abs(current[1] - points);
+          // const second = Math.abs(next[1] - points);
+
+          // const closest = first < second ? current[0] : next[0];
+
+          // return closest as Ranks;
+        }
       }
     }
 
@@ -109,10 +125,78 @@ export class MatchHelper {
     return [Math.round(player1Result), Math.round(player2Result)];
   }
 
-  static CalculateProbability(winnerPoints: number, loserPoints: number) {
+  private static CalculateProbability(
+    winnerPoints: number,
+    loserPoints: number
+  ) {
     return (
       (1.0 * 1.0) /
       (1 + 1.0 * Math.pow(10, (1.0 * (winnerPoints - loserPoints)) / 400))
+    );
+  }
+
+  static sendNotificationToBattleLogChannel(
+    winner: MongooseUser,
+    loser: MongooseUser,
+    pointsWon: number,
+    pointsLost: number,
+    winnerScore: number | null,
+    loserScore: number | null,
+    interaction: ChatInputCommandInteraction<CacheType>
+  ) {
+    const battleLogChannel = interaction.client.channels.cache.get(
+      ChannelIds.battleLog
+    );
+
+    if (battleLogChannel) {
+      const channel = battleLogChannel as TextChannel;
+      channel.sendTyping();
+      const text = `${format(new Date(), "dd-MM-Y K:a")}
+      
+      **${winner.name}** (${winner.points}) +${pointsWon} defeated **${
+        loser.name
+      }** (${loser.points}) ${pointsLost}
+      `;
+
+      const builderArg: {
+        title: string;
+        description: string;
+        fields?: EmbedField[];
+      } = {
+        title: "New match report:",
+        description: text,
+      };
+
+      if (this.canDisplayScores(winnerScore, loserScore)) {
+        builderArg["fields"] = [
+          {
+            name: `${winner.name} score:`,
+            value: String(winnerScore),
+            inline: true,
+          },
+          {
+            name: `${loser.name} score:`,
+            value: String(loserScore),
+            inline: true,
+          },
+        ];
+      }
+
+      const message = StringHelper.buildEmebd(builderArg, interaction);
+
+      channel.send({ embeds: [message] });
+    }
+  }
+
+  static canDisplayScores(
+    player1Score: number | null,
+    player2Score: number | null
+  ) {
+    return (
+      isNumber(player1Score) &&
+      player1Score >= 0 &&
+      isNumber(player2Score) &&
+      player2Score >= 0
     );
   }
 }
