@@ -16,7 +16,9 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "dev": "nodemon src/index.ts",
-    "deploy-commands": "ts-node src/deploy-command.ts"
+    "watch": "export NODE_ENV=dev&&nodemon src/index.ts",
+    "deploy-commands": "ts-node src/deploy-command.ts",
+    "deploy-commands-dev": "export NODE_ENV=dev&&ts-node src/deploy-command.ts"
   },
   "devDependencies": {
     "@types/node": "^20.3.2",
