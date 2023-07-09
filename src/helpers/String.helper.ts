@@ -3,8 +3,15 @@ import {
   ChatInputCommandInteraction,
   EmbedBuilder,
   EmbedField,
+  TextChannel,
+  User,
+  userMention,
 } from "discord.js";
 import { capitalize } from "lodash";
+import { MatchHelper } from "./match.helper";
+import { format } from "date-fns";
+import { ChannelIds } from "../models/enums/channelIDs";
+import { MongooseUser } from "../types/mongoose/User";
 
 export class StringHelper {
   static humanize(str: string) {
@@ -44,5 +51,102 @@ export class StringHelper {
       .setDescription(description)
       .setFooter({ text: "Tekken Master MK1 Ladder bot." })
       .addFields(fields || []);
+  }
+
+  static sendNotificationToBattleLogChannel(
+    winner: MongooseUser,
+    loser: MongooseUser,
+    pointsWon: number,
+    pointsLost: number,
+    winnerScore: number | null,
+    loserScore: number | null,
+    interaction: ChatInputCommandInteraction<CacheType>
+  ) {
+    const battleLogChannel = interaction.client.channels.cache.get(
+      ChannelIds.bettleLogDev
+    );
+
+    if (battleLogChannel) {
+      const channel = battleLogChannel as TextChannel;
+      channel.sendTyping();
+      const text = `${format(new Date(), "dd-MM-Y K:a")}
+      
+      **${winner.name}** (${winner.points}) +${pointsWon} defeated **${
+        loser.name
+      }** (${loser.points}) ${pointsLost}
+      `;
+
+      const builderArg: {
+        title: string;
+        description: string;
+        fields?: EmbedField[];
+      } = {
+        title: "New match report:",
+        description: text,
+      };
+
+      if (MatchHelper.canDisplayScores(winnerScore, loserScore)) {
+        builderArg["fields"] = [
+          {
+            name: `${winner.name} score:`,
+            value: String(winnerScore),
+            inline: true,
+          },
+          {
+            name: `${loser.name} score:`,
+            value: String(loserScore),
+            inline: true,
+          },
+        ];
+      }
+
+      const message = StringHelper.buildEmebd(builderArg, interaction);
+
+      channel.send({ embeds: [message] });
+    }
+  }
+
+  static sendRankChangedMessage(
+    player: MongooseUser,
+    direction: "up" | "down",
+    interaction: ChatInputCommandInteraction<CacheType>,
+    user: User
+  ) {
+    const battleLogChannel = interaction.client.channels.cache.get(
+      ChannelIds.battleLog
+    );
+
+    if (battleLogChannel) {
+      const channel = battleLogChannel as TextChannel;
+      channel.sendTyping();
+
+      const text = `${format(new Date(), "dd-MM-Y K:a")}
+      
+      **Hey, ${
+        player.name
+      }** you have ranked ${direction}. Your new rank is: ${this.humanize(
+        player.rank
+      )}`;
+
+      const builderArg: {
+        title: string;
+        description: string;
+        fields: EmbedField[];
+      } = {
+        title: "Rank updated:",
+        description: text,
+        fields: [
+          {
+            name: `Player`,
+            value: userMention(user.id),
+            inline: false,
+          },
+        ],
+      };
+
+      const message = StringHelper.buildEmebd(builderArg, interaction);
+
+      channel.send({ embeds: [message] });
+    }
   }
 }

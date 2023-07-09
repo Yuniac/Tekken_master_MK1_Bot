@@ -8,6 +8,7 @@ import UserModal from "../../models/user";
 import MatchModal from "../../models/match";
 import { MatchHelper } from "../../helpers/match.helper";
 import { MongooseUser } from "../../types/mongoose/User";
+import { StringHelper } from "../../helpers/String.helper";
 
 const data = new SlashCommandBuilder()
   .setName("m")
@@ -108,7 +109,18 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
       UserModal.findOne({ name: user.username }),
     ]);
 
-    MatchHelper.sendNotificationToBattleLogChannel(
+    MatchHelper.CheckIfPlayerHasRankedUpOrDown(
+      updatedWinner as unknown as MongooseUser,
+      interaction,
+      opponent
+    );
+    MatchHelper.CheckIfPlayerHasRankedUpOrDown(
+      updatedLoser as unknown as MongooseUser,
+      interaction,
+      user
+    );
+
+    StringHelper.sendNotificationToBattleLogChannel(
       updatedWinner as unknown as MongooseUser,
       updatedLoser as unknown as MongooseUser,
       pointsWon,
