@@ -55,71 +55,62 @@ export class MatchHelper {
     return Ranks[Ranks.mk_expert];
   }
 
-  // This would only run when both are unranked. For every other case, see `CheckIfPlayerHasRankedUpOrDown`
-  static async CheckIfPlayerGainedARank(
-    player1: MongooseUser,
-    player2: MongooseUser,
-    interaction: ChatInputCommandInteraction<CacheType>
-  ) {
-    if (player1.rank !== Ranks.unranked && player2.rank !== Ranks.unranked) {
-      return;
-    }
-
-    const [player1Matches, player2Matches] = await Promise.all([
-      MatchModal.find({
-        player1Rank: Ranks.unranked,
-        $or: [{ player1Name: player1.name }, { player2Name: player1.name }],
-      }),
-      MatchModal.find({
-        player2Rank: Ranks.unranked,
-        $or: [{ player1Name: player2.name }, { player2Name: player2.name }],
-      }),
-    ]);
-
-    const player1CanHaveARankNow =
-      player1Matches.length >= MatchHelper.numOfMatchesToGetARank;
-    const player2CanHaveARankNow =
-      player2Matches.length >= MatchHelper.numOfMatchesToGetARank;
-
-    if (player1CanHaveARankNow) {
-      const points = player1.points;
-      const rank = MatchHelper.getRankBasedOnPoints(points);
-      await UserModal.updateOne({ name: player1.name }, { $set: { rank } });
-    }
-
-    if (player2CanHaveARankNow) {
-      const points = player2.points;
-      const rank = MatchHelper.getRankBasedOnPoints(points);
-      await UserModal.updateOne({ name: player2.name }, { $set: { rank } });
-    }
-  }
-
   static async CheckIfPlayerHasRankedUpOrDown(
-    player: MongooseUser,
+    userName: string,
     interaction: ChatInputCommandInteraction<CacheType>,
     discordUser: User
   ) {
-    if (player.rank === Ranks.unranked) {
+    const player = await UserModal.findOne({ name: userName });
+
+    let notfiyUserOfRankChange = false;
+
+    if (!player) {
       return;
     }
 
     const newRank = MatchHelper.getRankBasedOnPoints(player.points);
 
-    if (newRank !== player.rank) {
-      await UserModal.findOneAndUpdate(
-        { name: player.name },
-        { rank: newRank }
-      );
-      const user = await UserModal.findOne({ name: player.name });
+    // This would only run when both are unranked. For every other case;
+    if (player.rank === Ranks.unranked) {
+      const playerMatchesCount = await MatchModal.countDocuments({
+        $and: [
+          { $or: [{ player1Name: player.name }, { player2Name: player.name }] },
+          {
+            $or: [
+              { player1Rank: Ranks.unranked },
+              { player2Rank: Ranks.unranked },
+            ],
+          },
+        ],
+      });
+
+      if (playerMatchesCount >= MatchHelper.numOfMatchesToGetARank) {
+        notfiyUserOfRankChange = true;
+        await UserModal.updateOne(
+          { name: userName },
+          { $set: { rank: newRank } }
+        );
+      }
+    } else if (player.rank !== newRank) {
+      notfiyUserOfRankChange = true;
+      await UserModal.findOneAndUpdate({ name: userName }, { rank: newRank });
+    }
+
+    if (notfiyUserOfRankChange) {
+      const updatedPlayer = (await UserModal.findOne({
+        name: userName,
+      })) as MongooseUser;
 
       const ranksInOrder = Object.keys(Ranks);
       const direction =
-        ranksInOrder.indexOf(player.rank) < ranksInOrder.indexOf(newRank)
+        player?.rank === Ranks.unranked
+          ? "up"
+          : ranksInOrder.indexOf(player?.rank) < ranksInOrder.indexOf(newRank)
           ? "up"
           : "down";
 
       StringHelper.sendRankChangedMessage(
-        user as unknown as MongooseUser,
+        updatedPlayer as unknown as MongooseUser,
         direction,
         interaction,
         discordUser

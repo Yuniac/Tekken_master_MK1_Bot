@@ -79,7 +79,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
   const pointsLost = loserDiffPoints - existingUser.points;
 
   try {
-    await Promise.all([
+    const [_, __, ___] = await Promise.all([
       MatchModal.create({
         winner: opponent.username,
         player1Name: opponent.username,
@@ -97,11 +97,6 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
         { name: user.username },
         { $inc: { points: pointsLost } }
       ),
-      MatchHelper.CheckIfPlayerGainedARank(
-        existingOpponent,
-        existingUser,
-        interaction
-      ),
     ]);
 
     const [updatedWinner, updatedLoser] = await Promise.all([
@@ -109,16 +104,21 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
       UserModal.findOne({ name: user.username }),
     ]);
 
-    MatchHelper.CheckIfPlayerHasRankedUpOrDown(
-      updatedWinner as unknown as MongooseUser,
-      interaction,
-      opponent
-    );
-    MatchHelper.CheckIfPlayerHasRankedUpOrDown(
-      updatedLoser as unknown as MongooseUser,
-      interaction,
-      user
-    );
+    if (updatedWinner) {
+      MatchHelper.CheckIfPlayerHasRankedUpOrDown(
+        updatedWinner.name,
+        interaction,
+        opponent
+      );
+    }
+
+    if (updatedLoser) {
+      MatchHelper.CheckIfPlayerHasRankedUpOrDown(
+        updatedLoser.name,
+        interaction,
+        user
+      );
+    }
 
     StringHelper.sendNotificationToBattleLogChannel(
       updatedWinner as unknown as MongooseUser,

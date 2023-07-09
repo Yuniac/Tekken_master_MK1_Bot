@@ -124,16 +124,16 @@ export class StringHelper {
       
       **Hey, ${
         player.name
-      }** you have ranked ${direction}. Your new rank is: ${this.humanize(
+      }** you have ranked ${direction}. Your new rank is: **${this.humanize(
         player.rank
-      )}`;
+      )}**`;
 
       const builderArg: {
         title: string;
         description: string;
         fields: EmbedField[];
       } = {
-        title: "Rank updated:",
+        title: "Rank update:",
         description: text,
         fields: [
           {
