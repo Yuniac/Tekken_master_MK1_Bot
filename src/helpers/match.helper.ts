@@ -99,6 +99,10 @@ export class MatchHelper {
     interaction: ChatInputCommandInteraction<CacheType>,
     discordUser: User
   ) {
+    if (player.rank === Ranks.unranked) {
+      return;
+    }
+
     const newRank = MatchHelper.getRankBasedOnPoints(player.points);
 
     if (newRank !== player.rank) {
