@@ -11,3 +11,8 @@ mongoose.set("strictQuery", true);
 mongoose.connect(process.env.DBACCESS!).then(({ connection }) => {
   console.log("Connected to the DB:", `'${connection.db.databaseName}'`);
 });
+
+process.on("uncaughtException", function (err) {
+  console.error(err);
+  console.log("Node NOT Exiting...");
+});
