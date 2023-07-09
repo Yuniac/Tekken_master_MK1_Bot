@@ -27,7 +27,7 @@ export const initDiscord = () => {
     const commandsPath = path.join(rootCommandsDirPath, commandFolder);
     const commandFiles = fs
       .readdirSync(commandsPath)
-      .filter((file) => file.endsWith(".ts"));
+      .filter((file) => file.endsWith(".ts") && !file.startsWith("_"));
     for (const file of commandFiles) {
       const filePath = path.join(commandsPath, file);
       console.log("Reading", filePath, "...");

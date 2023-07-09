@@ -103,11 +103,29 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
       ),
     ]);
 
+    const [updatedWinner, updatedLoser] = await Promise.all([
+      UserModal.findOne({ name: opponent.username }),
+      UserModal.findOne({ name: user.username }),
+    ]);
+
+    MatchHelper.sendNotificationToBattleLogChannel(
+      updatedWinner as unknown as MongooseUser,
+      updatedLoser as unknown as MongooseUser,
+      pointsWon,
+      pointsLost,
+      winnersScrore,
+      losersScore,
+      interaction
+    );
+
     interaction.reply(
-      // `Match results between ${userMention(opponent.id)} and ${userMention(
-      `${opponent.username} defeated ${user.username} in a best of 5 set ${
-        winnersScrore && winnersScrore >= 0 && losersScore && losersScore >= 0
-          ? `(${winnersScrore}-${losersScore})`
+      `**${userMention(opponent.id)}** ${
+        updatedWinner?.points
+      }(+${pointsWon}) defeated **${userMention(user.id)}** ${
+        updatedLoser?.points
+      }(${pointsLost}) in a best of 5 set${
+        MatchHelper.canDisplayScores(winnersScrore, losersScore)
+          ? ` (${winnersScrore}-${losersScore})`
           : ""
       }, GGs`
     );
