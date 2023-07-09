@@ -63,7 +63,7 @@ export class StringHelper {
     interaction: ChatInputCommandInteraction<CacheType>
   ) {
     const battleLogChannel = interaction.client.channels.cache.get(
-      ChannelIds.bettleLogDev
+      ChannelIds.battleLog
     );
 
     if (battleLogChannel) {
