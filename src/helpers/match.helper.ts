@@ -6,8 +6,7 @@ import { MongooseUser } from "../types/mongoose/User";
 import { RanksBreakingPoints } from "../models/enums/ranksBreakingPoints";
 
 export class MatchHelper {
-  // static numOfMatchesToGetARank = 10;
-  static numOfMatchesToGetARank = 3;
+  static numOfMatchesToGetARank = 5;
   static basePoints = [10, 10, 10, 8, 8, 8, 5];
   static pointsCalcBase = 30;
   // TODO Change number of matches needed to 5, instead of 10. to gain a rank
