@@ -1,4 +1,3 @@
-import "dotenv/config";
 import {
   CacheType,
   ChatInputCommandInteraction,
@@ -59,16 +58,14 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
     );
 
     interaction.reply(`
-    VS **${opponent.username}**. Their points: **${
-      mongoOpponent.points
-    }**, your points: **${mongoUser.points}**
+    VS **${opponent.username}**(${mongoOpponent.points}pts):
 
     If you win against **${opponent.username}**:
-        -You gain: **+${ifPlayerWins[0] - mongoUser.points}** points
+        -You gain: **+${ifPlayerWins[0] - mongoUser.points}** pts
 
 
     If you lose against **${opponent.username}**:
-        -You lose: **${mongoOpponent.points - ifPlayerLoses[0]}** points
+        -You lose: **${mongoOpponent.points - ifPlayerLoses[0]}** pts
     `);
   } catch (e: any) {
     console.log(e);

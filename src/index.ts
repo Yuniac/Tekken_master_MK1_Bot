@@ -1,4 +1,7 @@
-import "dotenv/config";
+require("dotenv").config({
+  path: process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : ".env",
+});
+
 import { initDiscord } from "./discord/main";
 import mongoose from "mongoose";
 

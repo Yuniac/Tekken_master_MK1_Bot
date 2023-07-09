@@ -1,4 +1,6 @@
-import "dotenv/config";
+require("dotenv").config({
+  path: process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : ".env",
+});
 
 import { REST, Routes } from "discord.js";
 import path from "path";
@@ -30,11 +32,8 @@ for (const folder of commandFolders) {
   }
 }
 
-// Construct and prepare an instance of the REST module
-console.log(process.env.discord_token);
 const api = new REST().setToken(process.env.discord_token!);
 
-// and deploy your commands!
 (async () => {
   try {
     console.log(
@@ -47,14 +46,6 @@ const api = new REST().setToken(process.env.discord_token!);
         process.env.clientId!,
         // ys guild
         process.env.guildId!
-      ),
-      { body: commands }
-    );
-    await api.put(
-      Routes.applicationGuildCommands(
-        process.env.clientId!,
-        // tekken master guild
-        "762263140208476170"
       ),
       { body: commands }
     );
