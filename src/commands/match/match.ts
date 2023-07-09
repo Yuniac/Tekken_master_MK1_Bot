@@ -8,6 +8,7 @@ import UserModal from "../../models/user";
 import MatchModal from "../../models/match";
 import { MatchHelper } from "../../helpers/match.helper";
 import { MongooseUser } from "../../types/mongoose/User";
+import { isNumber } from "lodash";
 
 const data = new SlashCommandBuilder()
   .setName("m")
@@ -78,7 +79,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
   const pointsLost = loserDiffPoints - existingUser.points;
 
   try {
-    const [_, updatedWinner, updatedLoser] = await Promise.all([
+    await Promise.all([
       MatchModal.create({
         winner: opponent.username,
         player1Name: opponent.username,
@@ -103,6 +104,11 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
       ),
     ]);
 
+    const [updatedWinner, updatedLoser] = await Promise.all([
+      UserModal.findOne({ name: opponent.username }),
+      UserModal.findOne({ name: user.username }),
+    ]);
+
     MatchHelper.sendNotificationToBattleLogChannel(
       updatedWinner as unknown as MongooseUser,
       updatedLoser as unknown as MongooseUser,
@@ -112,10 +118,16 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
     );
 
     interaction.reply(
-      // `Match results between ${userMention(opponent.id)} and ${userMention(
-      `${opponent.username} defeated ${user.username} in a best of 5 set ${
-        winnersScrore && winnersScrore >= 0 && losersScore && losersScore >= 0
-          ? `(${winnersScrore}-${losersScore})`
+      `**${userMention(opponent.id)}** ${
+        updatedWinner?.points
+      }(+${pointsWon}) defeated **${userMention(user.id)}** ${
+        updatedLoser?.points
+      }(${pointsLost}) in a best of 5 set${
+        isNumber(winnersScrore) &&
+        winnersScrore >= 0 &&
+        isNumber(losersScore) &&
+        losersScore >= 0
+          ? ` (${winnersScrore}-${losersScore})`
           : ""
       }, GGs`
     );
