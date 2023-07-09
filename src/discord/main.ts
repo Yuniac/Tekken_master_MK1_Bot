@@ -5,7 +5,6 @@ import fs from "fs";
 import { DiscordClient } from "../types/client";
 import { DiscordRoles } from "../models/enums/discordRoles";
 import UserModal from "../models/user";
-import { RanksBreakingPoints } from "../models/enums/ranksBreakingPoints";
 
 export const initDiscord = () => {
   console.log("Welcome. Firing the bot up!");
@@ -27,7 +26,7 @@ export const initDiscord = () => {
     const commandsPath = path.join(rootCommandsDirPath, commandFolder);
     const commandFiles = fs
       .readdirSync(commandsPath)
-      .filter((file) => file.endsWith(".ts"));
+      .filter((file) => file.endsWith(".ts") && !file.startsWith("_"));
     for (const file of commandFiles) {
       const filePath = path.join(commandsPath, file);
       console.log("Reading", filePath, "...");
