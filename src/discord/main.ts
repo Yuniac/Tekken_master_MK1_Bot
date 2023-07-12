@@ -1,5 +1,11 @@
 import "dotenv/config";
-import { Client, GatewayIntentBits, Events } from "discord.js";
+import {
+  Client,
+  GatewayIntentBits,
+  Events,
+  TextChannel,
+  Partials,
+} from "discord.js";
 import path from "path";
 import fs from "fs";
 import { DiscordClient } from "../types/client";
@@ -11,7 +17,12 @@ export const initDiscord = () => {
   console.log("Loading...");
 
   const client = new Client({
-    intents: [GatewayIntentBits.Guilds],
+    intents: [
+      GatewayIntentBits.Guilds,
+      GatewayIntentBits.Guilds,
+      GatewayIntentBits.GuildMembers,
+    ],
+    partials: [Partials.GuildMember],
   }) as Client<boolean> & {
     commands: Map<string, { data: Function; execute: Function }>;
   };
@@ -83,7 +94,7 @@ export const initDiscord = () => {
     }
   });
 
-  client.on("guildMemberUpdate", (oldMember, newMember) => {
+  client.on(Events.GuildMemberUpdate, async (oldMember, newMember) => {
     const name = newMember.user.username;
     const wasMod = oldMember.roles.cache.find(
       (r) => r.name === DiscordRoles.mod
@@ -94,11 +105,11 @@ export const initDiscord = () => {
     );
 
     if (wasMod && !isNowMod) {
-      UserModal.findOneAndUpdate({ name }, { $set: { isAdmin: false } });
+      await UserModal.updateOne({ name }, { isAdmin: false });
     }
 
     if (isNowMod && !wasMod) {
-      UserModal.findOneAndUpdate({ name }, { $set: { isAdmin: true } });
+      await UserModal.updateOne({ name }, { isAdmin: true });
     }
   });
 

@@ -1,6 +1,7 @@
 import { format } from "date-fns";
 import { MongooseUser } from "../types/mongoose/User";
 import { StringHelper } from "./String.helper";
+import { isNumber } from "lodash";
 
 export class PlayerHelper {
   static getInfo(
@@ -22,7 +23,7 @@ export class PlayerHelper {
     -Rank: **${StringHelper.humanize(rank)}**
     -Registered at: **${format(new Date(createdAt), "dd-MM-Y")}**
     -Sets played: **${matchesCount}**
-    ${winRate ? `-Win rate: **${Math.round(winRate!)}%**` : ""}
+    ${isNumber(winRate) ? `-Win rate: **${Math.round(winRate!)}%**` : ""}
   `;
   }
 }
