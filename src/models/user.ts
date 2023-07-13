@@ -44,5 +44,6 @@ const UserSchema = new Schema(
 const UserModal = mongoose.model("user", UserSchema);
 
 UserSchema.index({ name: 1 }, { unique: true });
+UserSchema.index({ points: 1 }, { unique: true });
 
 export default UserModal;
