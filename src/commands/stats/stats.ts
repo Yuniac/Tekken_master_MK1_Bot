@@ -9,7 +9,7 @@ import UserModal from "../../models/user";
 
 import MatchModal from "../../models/match";
 import { MongoMatch } from "../../types/mongoose/Match";
-import { uniq } from "lodash";
+import { sortedUniqBy, uniq, uniqBy } from "lodash";
 // @ts-ignore
 import * as StringTable from "string-table";
 import { ChannelIds } from "../../models/enums/channelIDs";
@@ -25,6 +25,8 @@ const data = new SlashCommandBuilder()
   );
 
 const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
+  await interaction.deferReply();
+
   const user = interaction.options.getUser("name");
 
   const [
@@ -58,12 +60,12 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
       `Error: Looks like this user (**${user?.username}**) isn't registered yet. We have no info about them.`
     );
   }
-  const users = uniq(
+  const users = sortedUniqBy(
     (matchesUserWasIn as unknown as MongoMatch[])
       .map((m) => [m.player1, m.player2])
       .flat()
-      .sort((a, b) => (b as MongooseUser)?.points - (a as MongooseUser)?.points)
-  );
+      .filter((user) => user?.name !== mongoUser.name)
+      .sort((a, b) => (b as MongooseUser)?.points - (a as MongooseUser)?.points), (user) => user?._id.valueOf());
 
   const generateLineOfDataUserByUser = (user: MongooseUser) => {
     const matches = matchesUserWasIn.filter((m) =>
@@ -78,7 +80,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
     const opponentName = user.name;
     const opponentPoints = String(user.points);
     const sets = String(matches.length);
-    const score = `${matches.length}-${matchesVsOpponentIWon.length}`;
+    const score = `${matchesVsOpponentIWon.length}-${matches.length}`;
     const winRate = `%${String(
       Number((matchesVsOpponentIWon.length * 100) / matches.length).toFixed()
     )}`;
@@ -138,7 +140,7 @@ Tekken Master MK1 Ladder bot.${"```"}`;
 
   const statsChannel = interaction.client.channels.cache.get(ChannelIds.stats);
 
-  interaction.reply(
+  interaction.followUp(
     `Stats of ${user.username} are ready to be viewed here: <#${statsChannel?.id}>`
   );
 
