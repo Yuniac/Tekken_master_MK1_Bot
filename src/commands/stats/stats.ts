@@ -144,9 +144,7 @@ ${stats}
 \r  
 Tekken Master MK1 Ladder bot.${"```"}`;
 
-  const statsChannel = interaction.client.channels.cache.get(
-    ChannelIds.statsDev
-  );
+  const statsChannel = interaction.client.channels.cache.get(ChannelIds.stats);
 
   interaction.reply(
     `Stats of ${user.username} are ready to be viewed here: <#${statsChannel?.id}>`
