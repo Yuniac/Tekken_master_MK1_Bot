@@ -1,19 +1,11 @@
-import {
-  ChatInputCommandInteraction,
-  CacheType,
-  TextChannel,
-  EmbedField,
-  User,
-} from "discord.js";
+import { ChatInputCommandInteraction, CacheType, User } from "discord.js";
 import MatchModal from "../models/match";
 import UserModal from "../models/user";
 import { Ranks } from "../models/enums/ranks";
 import { MongooseUser } from "../types/mongoose/User";
 import { RanksBreakingPoints } from "../models/enums/ranksBreakingPoints";
-import { format } from "date-fns";
 import { isNumber } from "lodash";
 import { StringHelper } from "./String.helper";
-import { ChannelIds } from "../models/enums/channelIDs";
 
 export class MatchHelper {
   static numOfMatchesToGetARank = 5;
