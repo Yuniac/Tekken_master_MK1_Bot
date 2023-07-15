@@ -7,6 +7,10 @@ import {
 import UserModal from "../../models/user";
 
 import MatchModal from "../../models/match";
+import { MongoMatch } from "../../types/mongoose/Match";
+import { uniq } from "lodash";
+// @ts-ignore
+import * as StringTable from "string-table";
 
 const data = new SlashCommandBuilder()
   .setName("stats")
@@ -22,16 +26,14 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
   const user = interaction.options.getUser("name");
 
   const [
-    users,
     mognoUser,
     leaderboard,
     matchesWonByUser,
     matchesLostByUser,
     matchesUserWasIn,
   ] = await Promise.all([
-    UserModal.find({ name: { $ne: user?.username } }).lean(),
     UserModal.findOne({ name: user?.username }).lean(),
-    UserModal.find().sort({ points: 1 }).lean(),
+    UserModal.find().sort({ points: -1 }).lean(),
     MatchModal.find({ winner: user?.username }).lean(),
     MatchModal.find({
       $and: [
@@ -46,9 +48,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
     }).lean(),
     MatchModal.find({
       $or: [{ player1Name: user?.username }, { player2Name: user?.username }],
-    })
-      .populate("player1 player2")
-      .lean(),
+    }).populate({ path: "player1 player2" }),
   ]);
 
   if (!mognoUser || !user) {
@@ -56,15 +56,17 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
       `Error: Looks like this user (**${user?.username}**) isn't registered yet. We have no info about them.`
     );
   }
+  const users = uniq(
+    (matchesUserWasIn as unknown as MongoMatch[])
+      .map((m) => [m.player1, m.player2])
+      .flat()
+      .sort((a, b) => (b as MongooseUser)?.points - (a as MongooseUser)?.points)
+  );
 
   const generateLineOfData = (user: MongooseUser) => {
     const matches = matchesUserWasIn.filter((m) =>
       [m.player1Name, m.player2Name].includes(user.name)
     );
-
-    if (!matches) {
-      return;
-    }
 
     const matchesVsOpponentIWon = matches.filter(
       (m) => m.winner === mognoUser.name
@@ -72,19 +74,25 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
 
     const name = mognoUser.name;
     const opponentName = user.name;
-    const opponentPoints = user.points;
-    const sets = matches.length;
+    const opponentPoints = String(user.points);
+    const sets = String(matches.length);
     const score = `${matches.length}-${
       matches.length - matchesVsOpponentIWon.length
     }`;
-    const winRate = (matchesVsOpponentIWon.length * 100) / matches.length;
+    const winRate = `%${String(
+      Number((matchesVsOpponentIWon.length * 100) / matches.length).toFixed()
+    )}`;
 
-    return `-${name} \t vs \t ${opponentName}(${opponentPoints}) \t S:${sets} \t Sc:${score} \t WinRate: %${winRate}
-    
-    \r`;
+    return {
+      name,
+      opponent: `${opponentName}(${opponentPoints})`,
+      sets,
+      score,
+      winRate,
+    };
   };
 
-  const stats = users.map((u) =>
+  const data = users.map((u) =>
     generateLineOfData(u as unknown as MongooseUser)
   );
 
@@ -96,25 +104,47 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
   const sets = matchesWonByUser.length + matchesLostByUser.length;
   const wins = matchesWonByUser.length;
   const loses = matchesLostByUser.length;
-  const winRate =
+  const winRate = Number(
     (matchesWonByUser.length * 100) /
-    (matchesWonByUser.length + matchesLostByUser.length);
+      (matchesWonByUser.length + matchesLostByUser.length)
+  ).toFixed();
 
-  const message = `${"```cs"}
-  Below are ${name}'s all time stats:
+  const playerInfo = `#${leaderboardRank} Points:${points}. Sets:${sets}   Wins:${wins}.   Loses:${loses}   Winrate: %${winRate}`;
 
-  #${leaderboardRank} ${name}. Points:${points}. Sets:${sets}   Wins:${wins}.   Loses:${loses}   Winrate: ${winRate}  
-  ----------------------------------------------------------------------
-  -Player \t vs \t Player(rating) \t Sets \t Score \t Winrate
-  ----------------------------------------------------------------------
+  const stats = StringTable.create(data, {
+    rowSeparator: "-",
+    headerSeparator: "~",
+    capitalizeHeaders: true,
+    formatters: {
+      opponent: function (value: string | number) {
+        return {
+          value: value as string,
+          format: {
+            color: "cyan",
+          },
+        };
+      },
+      winRate: function (value: string | number) {
+        return {
+          value: value as string,
+          format: {
+            alignment: "right",
+          },
+        };
+      },
+    },
+  });
 
-  
-  ${stats.join()}
+  const message = `${"```ini"}
+Below are ${name}'s all time stats:
+${playerInfo}
+\r  
+${stats}
 
+\r  
+Tekken Master MK1 Ladder bot.
+  ${"```"}`;
 
-  
-  
-  ${"\r```"}`;
   interaction.reply(message);
 };
 
