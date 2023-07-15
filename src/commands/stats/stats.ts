@@ -65,7 +65,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
       .sort((a, b) => (b as MongooseUser)?.points - (a as MongooseUser)?.points)
   );
 
-  const generateLineOfData = (user: MongooseUser) => {
+  const generateLineOfDataUserByUser = (user: MongooseUser) => {
     const matches = matchesUserWasIn.filter((m) =>
       [m.player1Name, m.player2Name].includes(user.name)
     );
@@ -93,22 +93,23 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
   };
 
   const data = users.map((u) =>
-    generateLineOfData(u as unknown as MongooseUser)
+    generateLineOfDataUserByUser(u as unknown as MongooseUser)
   );
 
-  const name = mongoUser.name;
-  const points = mongoUser.points;
-  const leaderboardRank = leaderboard.findIndex(
-    ({ name }) => name === user?.username
-  );
-  const sets = matchesWonByUser.length + matchesLostByUser.length;
-  const wins = matchesWonByUser.length;
-  const loses = matchesLostByUser.length;
-  const winRate = Number(
-    (matchesWonByUser.length * 100) / matchesUserWasIn.length
-  ).toFixed();
+  const generateHeader = () => {
+    const points = mongoUser.points;
+    const leaderboardRank = leaderboard.findIndex(
+      ({ name }) => name === user?.username
+    );
+    const sets = matchesWonByUser.length + matchesLostByUser.length;
+    const wins = matchesWonByUser.length;
+    const loses = matchesLostByUser.length;
+    const winRate = Number(
+      (matchesWonByUser.length * 100) / matchesUserWasIn.length
+    ).toFixed();
 
-  const playerInfo = `#${leaderboardRank} Points:${points}. Sets:${sets}   Wins:${wins}.   Loses:${loses}   Winrate: %${winRate}`;
+    return `#${leaderboardRank} Points:${points}. Sets:${sets}   Wins:${wins}.   Loses:${loses}   Winrate: %${winRate}`;
+  };
 
   const stats = StringTable.create(data, {
     rowSeparator: "-",
@@ -135,14 +136,13 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
   });
 
   const message = `${"```ini"}
-Below are ${name}'s all time stats:
-${playerInfo}
+Below are ${mongoUser.name}'s all time stats:
+${generateHeader()}
 \r  
 ${stats}
 
 \r  
-Tekken Master MK1 Ladder bot.
-  ${"```"}`;
+Tekken Master MK1 Ladder bot.${"```"}`;
 
   const statsChannel = interaction.client.channels.cache.get(
     ChannelIds.statsDev
