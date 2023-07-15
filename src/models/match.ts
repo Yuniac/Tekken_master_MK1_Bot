@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { MatchesKind } from "./enums/matchesKinds";
-import UserModal from "./user";
 import { Ranks } from "./enums/ranks";
+import UserModal from "./user";
 const Schema = mongoose.Schema;
 
 const MatchSchema = new Schema(
@@ -56,15 +56,17 @@ const MatchSchema = new Schema(
 );
 
 MatchSchema.virtual("player1", {
-  ref: UserModal.name,
-  localField: "player1",
+  ref: UserModal.modelName,
+  localField: "player1Name",
   foreignField: "name",
+  justOne: true,
 });
 
 MatchSchema.virtual("player2", {
-  ref: UserModal.name,
-  localField: "player2",
+  ref: UserModal.modelName,
+  localField: "player2Name",
   foreignField: "name",
+  justOne: true,
 });
 
 const MatchModal = mongoose.model("match", MatchSchema);
