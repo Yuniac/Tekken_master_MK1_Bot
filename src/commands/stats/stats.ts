@@ -116,14 +116,6 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
     headerSeparator: "~",
     capitalizeHeaders: true,
     formatters: {
-      opponent: function (value: string | number) {
-        return {
-          value: value as string,
-          format: {
-            color: "cyan",
-          },
-        };
-      },
       winRate: function (value: string | number) {
         return {
           value: value as string,
