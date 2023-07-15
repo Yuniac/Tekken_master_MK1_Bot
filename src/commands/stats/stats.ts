@@ -3,6 +3,7 @@ import {
   CacheType,
   ChatInputCommandInteraction,
   SlashCommandBuilder,
+  TextChannel,
 } from "discord.js";
 import UserModal from "../../models/user";
 
@@ -11,6 +12,7 @@ import { MongoMatch } from "../../types/mongoose/Match";
 import { uniq } from "lodash";
 // @ts-ignore
 import * as StringTable from "string-table";
+import { ChannelIds } from "../../models/enums/channelIDs";
 
 const data = new SlashCommandBuilder()
   .setName("stats")
@@ -145,7 +147,19 @@ ${stats}
 Tekken Master MK1 Ladder bot.
   ${"```"}`;
 
-  interaction.reply(message);
+  const statsChannel = interaction.client.channels.cache.get(
+    ChannelIds.statsDev
+  );
+
+  interaction.reply(
+    `Stats of ${user.username} are ready to be viewed here: <#${statsChannel?.id}>`
+  );
+
+  if (statsChannel) {
+    const channel = statsChannel as TextChannel;
+    channel.sendTyping();
+    channel.send(message);
+  }
 };
 
 export { data, execute };
