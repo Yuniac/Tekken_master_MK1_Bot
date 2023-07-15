@@ -1,11 +1,5 @@
 import "dotenv/config";
-import {
-  Client,
-  GatewayIntentBits,
-  Events,
-  TextChannel,
-  Partials,
-} from "discord.js";
+import { Client, GatewayIntentBits, Events, Partials } from "discord.js";
 import path from "path";
 import fs from "fs";
 import { DiscordClient } from "../types/client";
@@ -21,6 +15,8 @@ export const initDiscord = () => {
       GatewayIntentBits.Guilds,
       GatewayIntentBits.Guilds,
       GatewayIntentBits.GuildMembers,
+      GatewayIntentBits.GuildMessages,
+      GatewayIntentBits.GuildMessageReactions,
     ],
     partials: [Partials.GuildMember],
   }) as Client<boolean> & {

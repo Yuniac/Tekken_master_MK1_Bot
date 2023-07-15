@@ -21,11 +21,13 @@ const data = new SlashCommandBuilder()
   );
 
 const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
+  await interaction.deferReply();
+
   const opponent = interaction.options.getUser("opponent");
   const user = interaction.user;
 
   if (!user || !opponent) {
-    return interaction.reply(
+    return interaction.followUp(
       "Error: Sorry, someting went wrong and we can't process this user at this time."
     );
   }
@@ -37,13 +39,13 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
     ]);
 
     if (!mongoUser) {
-      return interaction.reply(
+      return interaction.followUp(
         `Error: There's no registered user with the name **${user.username}**. User must be registered before you can calculate your points against them.`
       );
     }
 
     if (!mongoOpponent) {
-      return interaction.reply(
+      return interaction.followUp(
         `Error: There's no registered user with the name **${opponent.username}**. User must be registered before you can calculate your points against them.`
       );
     }
@@ -78,10 +80,10 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
       interaction
     );
 
-    interaction.reply({ embeds: [message] });
+    interaction.followUp({ embeds: [message] });
   } catch (e: any) {
     console.log(e);
-    interaction.reply(
+    interaction.followUp(
       `Error: Sorry, something went wrong while storing your user data. Share this error with our developers to help you: "${e}"`
     );
   }

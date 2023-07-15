@@ -2,6 +2,7 @@ import {
   CacheType,
   ChatInputCommandInteraction,
   SlashCommandBuilder,
+  TextChannel,
   userMention,
 } from "discord.js";
 import UserModal from "../../models/user";
@@ -33,19 +34,21 @@ const data = new SlashCommandBuilder()
   );
 
 const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
+  await interaction.deferReply();
+
   const user = interaction.user;
   const opponent = interaction.options.getUser("winner");
   const winnersScrore = interaction.options.getInteger("winner-score");
   const losersScore = interaction.options.getInteger("loser-score");
 
   if (!user || !opponent) {
-    return interaction.reply(
+    return interaction.followUp(
       "Error: Sorry, someting went wrong and we can't process your user info or your opponents at this time. Make sure both players are registered before using this command"
     );
   }
 
   if (user.id === opponent.id) {
-    return interaction.reply(
+    return interaction.followUp(
       "Error: You can't report yourself as a winner. Reporting is done by the loser. For help, contact the moderators"
     );
   }
@@ -58,13 +61,13 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
   })) as MongooseUser;
 
   if (!existingUser) {
-    return interaction.reply(
+    return interaction.followUp(
       `Error: You aren't registered, and you can't use this command before registering. Register yourself first by doing /reg then report the match.`
     );
   }
 
   if (!existingOpponent) {
-    return interaction.reply(
+    return interaction.followUp(
       `Error: Your oppoennt ${opponent.username} isn't a registered member. Have them register themselves first, then report the result of the match.`
     );
   }
@@ -129,8 +132,13 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
       losersScore,
       interaction
     );
+    const channel = interaction.client.channels.cache.get(
+      interaction.channelId
+    ) as TextChannel;
 
-    interaction.reply(
+    await interaction.followUp("Set recorded!");
+
+    channel.send(
       `**${userMention(opponent.id)}** ${
         updatedWinner?.points
       }(+${pointsWon}) defeated **${userMention(user.id)}** ${
@@ -143,7 +151,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
     );
   } catch (e: any) {
     console.log(e);
-    interaction.reply(
+    interaction.followUp(
       `Error: Sorry, something went wrong while storing your user data. Share this error with our developers to help you: "${e}"`
     );
   }

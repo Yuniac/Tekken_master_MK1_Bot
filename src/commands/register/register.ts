@@ -17,11 +17,12 @@ const data = new SlashCommandBuilder()
   );
 
 const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
-  const embeddedUser = interaction.user;
+  await interaction.deferReply();
 
+  const embeddedUser = interaction.user;
   const user = interaction.options.getUser("name");
   if (!user) {
-    return interaction.reply(
+    return interaction.followUp(
       "Error: Sorry, someting went wrong and we can't process this user at this time."
     );
   }
@@ -29,14 +30,14 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
   const existingUser = await UserModal.findOne({ name: user.username });
 
   if (existingUser) {
-    return interaction.reply(
+    return interaction.followUp(
       `A user with the name of **${user.username}** already exists. Please choose a different name.`
     );
   }
   const isSelfRegistery = embeddedUser.username === user.username;
 
   if (!isSelfRegistery) {
-    return interaction.reply(
+    return interaction.followUp(
       `Error: You can only register yourself. You entered username **${user.username}**`
     );
   }
@@ -54,10 +55,10 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
 
     If you ever need to see your info, use **/myself**.
   `;
-    interaction.reply(response);
+    interaction.followUp(response);
   } catch (e: any) {
     console.log(e);
-    interaction.reply(
+    interaction.followUp(
       `Sorry, something went wrong while storing your user data. Share this error with our developers to help you: "${e}"`
     );
   }

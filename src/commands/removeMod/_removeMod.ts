@@ -20,19 +20,21 @@ const data = new SlashCommandBuilder()
   );
 
 const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
+  await interaction.deferReply({ ephemeral: true });
+
   const user = interaction.options.getUser("name");
   const password = interaction.options.getString("password");
 
   const _password = process.env.adminPassword;
 
   if (password !== _password) {
-    return interaction.reply(
+    return interaction.followUp(
       "Error: Incorrect password. This command is only available for admins"
     );
   }
 
   if (!user) {
-    return interaction.reply(
+    return interaction.followUp(
       "Error: Sorry, someting went wrong and we can't process this user at this time."
     );
   }
@@ -41,13 +43,13 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
   const existingUser = await UserModal.findOne({ name });
 
   if (!existingUser) {
-    return interaction.reply(
+    return interaction.followUp(
       `Error: There's no registered user with the name **${name}**. User must be registered before they can be made an admin.`
     );
   }
 
   if (existingUser && existingUser.isAdmin === false) {
-    return interaction.reply(
+    return interaction.followUp(
       `Error: User **${name}** is not admin. To make a user an admin, use **/make-admin** instead.`
     );
   }
@@ -64,17 +66,17 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
 
     if (modRole && member) {
       member.roles.remove(modRole);
-      interaction.reply(
+      interaction.followUp(
         `**${existingUser.name}** has been demoted as an admin.`
       );
     } else {
-      interaction.reply(
+      interaction.followUp(
         "Something went wrong while removing the roles for user"
       );
     }
   } catch (e: any) {
     console.log(e);
-    interaction.reply(
+    interaction.followUp(
       `Error: Sorry, something went wrong while storing your user data. Share this error with our developers to help you: "${e}"`
     );
   }
