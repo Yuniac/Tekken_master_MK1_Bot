@@ -28,7 +28,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
   const user = interaction.options.getUser("name");
 
   const [
-    mognoUser,
+    mongoUser,
     leaderboard,
     matchesWonByUser,
     matchesLostByUser,
@@ -53,7 +53,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
     }).populate({ path: "player1 player2" }),
   ]);
 
-  if (!mognoUser || !user) {
+  if (!mongoUser || !user) {
     return interaction.reply(
       `Error: Looks like this user (**${user?.username}**) isn't registered yet. We have no info about them.`
     );
@@ -71,16 +71,14 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
     );
 
     const matchesVsOpponentIWon = matches.filter(
-      (m) => m.winner === mognoUser.name
+      (m) => m.winner === mongoUser?.name
     );
 
-    const name = mognoUser.name;
+    const name = mongoUser.name;
     const opponentName = user.name;
     const opponentPoints = String(user.points);
     const sets = String(matches.length);
-    const score = `${matches.length}-${
-      matches.length - matchesVsOpponentIWon.length
-    }`;
+    const score = `${matches.length}-${matchesVsOpponentIWon.length}`;
     const winRate = `%${String(
       Number((matchesVsOpponentIWon.length * 100) / matches.length).toFixed()
     )}`;
@@ -98,8 +96,8 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
     generateLineOfData(u as unknown as MongooseUser)
   );
 
-  const name = mognoUser.name;
-  const points = mognoUser.points;
+  const name = mongoUser.name;
+  const points = mongoUser.points;
   const leaderboardRank = leaderboard.findIndex(
     ({ name }) => name === user?.username
   );
@@ -107,8 +105,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
   const wins = matchesWonByUser.length;
   const loses = matchesLostByUser.length;
   const winRate = Number(
-    (matchesWonByUser.length * 100) /
-      (matchesWonByUser.length + matchesLostByUser.length)
+    (matchesWonByUser.length * 100) / matchesUserWasIn.length
   ).toFixed();
 
   const playerInfo = `#${leaderboardRank} Points:${points}. Sets:${sets}   Wins:${wins}.   Loses:${loses}   Winrate: %${winRate}`;
