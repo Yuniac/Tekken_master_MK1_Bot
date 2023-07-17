@@ -4,8 +4,13 @@ require("dotenv").config({
 
 import { initDiscord } from "./discord/main";
 import mongoose from "mongoose";
+import { initScoreBoard } from "./discord/scoreboard";
 
-initDiscord();
+const client = initDiscord();
+
+client.on("ready", () => {
+  initScoreBoard(client);
+});
 
 mongoose.set("strictQuery", true);
 mongoose.connect(process.env.DBACCESS!).then(({ connection }) => {

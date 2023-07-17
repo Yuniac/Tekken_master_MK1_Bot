@@ -9,10 +9,11 @@ import UserModal from "../../models/user";
 
 import MatchModal from "../../models/match";
 import { MongoMatch } from "../../types/mongoose/Match";
-import { sortedUniqBy, uniq, uniqBy } from "lodash";
+import { sortedUniqBy } from "lodash";
 // @ts-ignore
 import * as StringTable from "string-table";
 import { ChannelIds } from "../../models/enums/channelIDs";
+import { basicTabelConfig } from "../../util/tabel.config";
 
 const data = new SlashCommandBuilder()
   .setName("stats")
@@ -65,7 +66,11 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
       .map((m) => [m.player1, m.player2])
       .flat()
       .filter((user) => user?.name !== mongoUser.name)
-      .sort((a, b) => (b as MongooseUser)?.points - (a as MongooseUser)?.points), (user) => user?._id.valueOf());
+      .sort(
+        (a, b) => (b as MongooseUser)?.points - (a as MongooseUser)?.points
+      ),
+    (user) => user?._id.valueOf()
+  );
 
   const generateLineOfDataUserByUser = (user: MongooseUser) => {
     const matches = matchesUserWasIn.filter((m) =>
@@ -114,9 +119,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
   };
 
   const stats = StringTable.create(data, {
-    rowSeparator: "-",
-    headerSeparator: "~",
-    capitalizeHeaders: true,
+    ...basicTabelConfig,
     formatters: {
       winRate: function (value: string | number) {
         return {
@@ -129,7 +132,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
     },
   });
 
-  const message = `${"```ini"}
+  const message = `${"```cpp"}
 Below are ${mongoUser.name}'s all time stats:
 ${generateHeader()}
 \r  

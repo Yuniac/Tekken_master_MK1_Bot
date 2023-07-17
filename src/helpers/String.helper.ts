@@ -12,6 +12,7 @@ import { MatchHelper } from "./match.helper";
 import { format } from "date-fns";
 import { ChannelIds } from "../models/enums/channelIDs";
 import { MongooseUser } from "../types/mongoose/User";
+import { MongoMatch } from "../types/mongoose/Match";
 
 export class StringHelper {
   static humanize(str: string) {
@@ -148,5 +149,17 @@ export class StringHelper {
 
       channel.send({ embeds: [message] });
     }
+  }
+
+  static buildScoreBoardMesssage(data: string) {
+    const message = `${"```cpp"}
+The scoreboard:
+
+${data}    
+\r  
+  
+Tekken Master MK1 Ladder bot.${"```"}`;
+
+    return message;
   }
 }

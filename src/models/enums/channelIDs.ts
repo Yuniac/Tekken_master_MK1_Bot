@@ -3,4 +3,6 @@ export enum ChannelIds {
   bettleLogDev = "1127600711492960276",
   stats = "1110626857931518063",
   statsDev = "1129782806814392331",
+  scoreboard = "1110627342113579088",
+  scoreboardDev = "1130580612999291023",
 }

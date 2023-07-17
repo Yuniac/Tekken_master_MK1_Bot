@@ -1,4 +1,9 @@
-import { ChatInputCommandInteraction, CacheType, User } from "discord.js";
+import {
+  ChatInputCommandInteraction,
+  CacheType,
+  User,
+  TextChannel,
+} from "discord.js";
 import MatchModal from "../models/match";
 import UserModal from "../models/user";
 import { Ranks } from "../models/enums/ranks";
@@ -6,6 +11,11 @@ import { MongooseUser } from "../types/mongoose/User";
 import { RanksBreakingPoints } from "../models/enums/ranksBreakingPoints";
 import { isNumber } from "lodash";
 import { StringHelper } from "./String.helper";
+// @ts-ignore
+import * as StringTable from "string-table";
+import { ChannelIds } from "../models/enums/channelIDs";
+import { MongoMatch } from "../types/mongoose/Match";
+import { basicTabelConfig } from "../util/tabel.config";
 
 export class MatchHelper {
   static numOfMatchesToGetARank = 5;
@@ -156,5 +166,77 @@ export class MatchHelper {
       isNumber(player2Score) &&
       player2Score >= 0
     );
+  }
+
+  static generateLineOfDataUserByUserForScoreboard(
+    user: MongooseUser,
+    index: number,
+    aulMatches: MongoMatch[]
+  ) {
+    const matches = aulMatches.filter((m) =>
+      [m.player1Name, m.player2Name].includes(user.name)
+    );
+
+    const matchesVsOpponentIWon = matches.filter((m) => m.winner === user.name);
+
+    const playerName = user.name;
+    const points = user.points;
+    const rank = user.rank;
+    const sets = String(matches.length);
+    const wins = matchesVsOpponentIWon.length;
+    const loses = String(matchesVsOpponentIWon.length - matches.length);
+    const winRate = `%${
+      matchesVsOpponentIWon.length > 0
+        ? String(
+            Number(
+              (matchesVsOpponentIWon.length * 100) / matches.length
+            ).toFixed()
+          )
+        : 0
+    }`;
+
+    return {
+      "#": `${index + 1}.`,
+      name: playerName,
+      rating: points,
+      rank: StringHelper.humanize(rank),
+      sets: `S:${sets}`,
+      wins: `W:${wins}`,
+      loses: `L:${loses}`,
+      winRate: `WinRate ${winRate}`,
+    };
+  }
+
+  static async getScoreBoardData() {
+    const [allPlayers, allMatches] = await Promise.all([
+      UserModal.find().sort({ points: -1 }).lean(),
+      MatchModal.find().lean(),
+    ]);
+
+    const data = allPlayers.map((u, i) =>
+      this.generateLineOfDataUserByUserForScoreboard(
+        u as unknown as MongooseUser,
+        i,
+        allMatches as unknown as MongoMatch[]
+      )
+    );
+
+    const result = StringTable.create(data, basicTabelConfig);
+
+    return StringHelper.buildScoreBoardMesssage(result);
+  }
+
+  static async rehydrateScoreBoardMessage(
+    interaction: ChatInputCommandInteraction<CacheType>
+  ) {
+    const channel = (await interaction.client.channels.cache.get(
+      ChannelIds.scoreboardDev
+    )!) as TextChannel;
+    const messages = await channel.messages.fetch({ limit: 1 });
+    const scoreboardMessage = messages.first()!;
+
+    const content = scoreboardMessage.edit({
+      content: await this.getScoreBoardData(),
+    });
   }
 }

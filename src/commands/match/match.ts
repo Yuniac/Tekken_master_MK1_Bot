@@ -137,6 +137,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
     ) as TextChannel;
 
     await interaction.followUp("Set recorded!");
+    MatchHelper.rehydrateScoreBoardMessage(interaction);
 
     channel.send(
       `**${userMention(opponent.id)}** ${
