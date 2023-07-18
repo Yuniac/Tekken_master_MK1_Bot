@@ -184,8 +184,10 @@ export class MatchHelper {
     const rank = user.rank;
     const sets = String(matches.length);
     const wins = matchesVsOpponentIWon.length;
-    const loses = String(matchesVsOpponentIWon.length - matches.length);
-    const winRate = `%${
+    const loses = String(
+      Math.abs(matchesVsOpponentIWon.length - matches.length)
+    );
+    const winRate = `${
       matchesVsOpponentIWon.length > 0
         ? String(
             Number(
@@ -193,7 +195,7 @@ export class MatchHelper {
             ).toFixed()
           )
         : 0
-    }`;
+    }%`;
 
     return {
       "#": `${index + 1}.`,
@@ -221,9 +223,7 @@ export class MatchHelper {
       )
     );
 
-    const result = StringTable.create(data, basicTabelConfig);
-
-    return StringHelper.buildScoreBoardMesssage(result);
+    return StringTable.create(data, basicTabelConfig);
   }
 
   static async rehydrateScoreBoardMessage(
@@ -235,7 +235,7 @@ export class MatchHelper {
     const messages = await channel.messages.fetch({ limit: 1 });
     const scoreboardMessage = messages.first()!;
 
-    const content = scoreboardMessage.edit({
+    scoreboardMessage.edit({
       content: await this.getScoreBoardData(),
     });
   }

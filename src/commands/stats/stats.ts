@@ -120,6 +120,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
 
   const stats = StringTable.create(data, {
     ...basicTabelConfig,
+    rowSeparator: ".",
     formatters: {
       winRate: function (value: string | number) {
         return {

@@ -156,9 +156,7 @@ export class StringHelper {
 The scoreboard:
 
 ${data}    
-\r  
-  
-Tekken Master MK1 Ladder bot.${"```"}`;
+${"```"}`;
 
     return message;
   }

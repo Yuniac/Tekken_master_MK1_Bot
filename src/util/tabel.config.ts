@@ -1,5 +1,5 @@
 export const basicTabelConfig = {
-  rowSeparator: ".",
+  rowSeparator: "",
   headerSeparator: "~",
   capitalizeHeaders: true,
 };
