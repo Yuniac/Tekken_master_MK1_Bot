@@ -16,6 +16,8 @@ import * as StringTable from "string-table";
 import { ChannelIds } from "../models/enums/channelIDs";
 import { MongoMatch } from "../types/mongoose/Match";
 import { basicTabelConfig } from "../util/tabel.config";
+import { DiscordClient } from "../types/client";
+import { initScoreBoard } from "../discord/scoreboard";
 
 export class MatchHelper {
   static numOfMatchesToGetARank = 5;
@@ -229,17 +231,25 @@ export class MatchHelper {
     });
   }
 
-  static async rehydrateScoreBoardMessage(
-    interaction: ChatInputCommandInteraction<CacheType>
-  ) {
-    const channel = (await interaction.client.channels.cache.get(
+  static async rehydrateScoreBoardMessage(client: DiscordClient) {
+    const channel = (await client.channels.cache.get(
       ChannelIds.scoreboardDev
     )!) as TextChannel;
-    const messages = await channel.messages.fetch({ limit: 1 });
-    const scoreboardMessage = messages.first()!;
 
-    scoreboardMessage.edit({
-      content: await this.getScoreBoardData(),
-    });
+    console.log("Started cleaning the scoreboard");
+
+    let hasMessages = true;
+
+    while (hasMessages) {
+      const messages = await channel.messages.fetch({ limit: 100 });
+      await channel.bulkDelete(messages);
+      const remainingMessages = await channel.messages.fetch({ limit: 100 });
+
+      if (remainingMessages.size <= 0) {
+        hasMessages = false;
+      }
+    }
+    console.log("Finished cleaning the scoreboard");
+    initScoreBoard(client);
   }
 }

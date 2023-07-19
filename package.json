@@ -6,11 +6,13 @@
   "license": "MIT",
   "dependencies": {
     "@types/lodash": "^4.14.195",
+    "@types/node-cron": "^3.0.8",
     "date-fns": "^2.30.0",
     "discord.js": "^14.11.0",
     "dotenv": "^16.3.1",
     "lodash": "^4.17.21",
     "mongoose": "^7.3.1",
+    "node-cron": "^3.0.2",
     "nodemon": "^2.0.22",
     "string-table": "^0.1.5"
   },

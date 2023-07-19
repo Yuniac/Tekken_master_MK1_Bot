@@ -152,11 +152,11 @@ export class StringHelper {
   }
 
   static buildScoreBoardMesssage(data: string) {
-    const message = `${"```cpp"}
-The scoreboard:
+    const message = `
+The scoreboard (Powerd by Tekken Master Leaderboard bot. Refreshes every 6 hours.)
 
 ${data}    
-${"```"}`;
+`;
 
     return message;
   }
