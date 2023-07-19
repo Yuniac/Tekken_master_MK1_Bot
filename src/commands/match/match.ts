@@ -157,4 +157,6 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
   }
 };
 
-export { data, execute };
+const cooldown = 10;
+
+export { data, execute, cooldown };
