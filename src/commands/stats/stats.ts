@@ -65,7 +65,11 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
       .map((m) => [m.player1, m.player2])
       .flat()
       .filter((user) => user?.name !== mongoUser.name)
-      .sort((a, b) => (b as MongooseUser)?.points - (a as MongooseUser)?.points), (user) => user?._id.valueOf());
+      .sort(
+        (a, b) => (b as MongooseUser)?.points - (a as MongooseUser)?.points
+      ),
+    (user) => user?._id.valueOf()
+  );
 
   const generateLineOfDataUserByUser = (user: MongooseUser) => {
     const matches = matchesUserWasIn.filter((m) =>
@@ -151,4 +155,6 @@ Tekken Master MK1 Ladder bot.${"```"}`;
   }
 };
 
-export { data, execute };
+const cooldown = 5;
+
+export { data, execute, cooldown };
