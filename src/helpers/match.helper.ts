@@ -187,15 +187,14 @@ export class MatchHelper {
     const loses = String(
       Math.abs(matchesVsOpponentIWon.length - matches.length)
     );
-    const winRate = `${
+    const winRate =
       matchesVsOpponentIWon.length > 0
         ? String(
             Number(
               (matchesVsOpponentIWon.length * 100) / matches.length
             ).toFixed()
           )
-        : 0
-    }%`;
+        : 0;
 
     return {
       "#": `${index + 1}.`,
@@ -205,7 +204,7 @@ export class MatchHelper {
       sets: `S:${sets}`,
       wins: `W:${wins}`,
       loses: `L:${loses}`,
-      winRate: `WinRate ${winRate}`,
+      winRate: `WinRate:${winRate}%`,
     };
   }
 
@@ -223,7 +222,11 @@ export class MatchHelper {
       )
     );
 
-    return StringTable.create(data, basicTabelConfig);
+    return StringTable.create(data, {
+      ...basicTabelConfig,
+      headerSeparator: "-",
+      innerBorder: "‎",
+    });
   }
 
   static async rehydrateScoreBoardMessage(
