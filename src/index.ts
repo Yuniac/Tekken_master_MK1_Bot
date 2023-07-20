@@ -1,6 +1,7 @@
 require("dotenv").config({
   path: process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : ".env",
 });
+process.env.TZ = "Etc/GMT+3"
 
 import cron from "node-cron";
 import { initDiscord } from "./discord/main";
