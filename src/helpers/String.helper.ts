@@ -149,4 +149,23 @@ export class StringHelper {
       channel.send({ embeds: [message] });
     }
   }
+
+  static buildScoreBoardMesssage(data: string) {
+    if (!data.length) {
+      return `Welcome to the scoreboard (Powerd by Tekken Master Leaderboard bot. Refreshes every 6 hours). 
+      
+Once there is data available, we will make sure to display it here!
+`;
+    }
+    const message = `
+The scoreboard (Powerd by Tekken Master Leaderboard bot. Refreshes every 6 hours. Last refresh was ${format(
+      new Date(),
+      "EEEE dd-K:a"
+    )})
+
+${data}    
+`;
+
+    return message;
+  }
 }

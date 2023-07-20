@@ -75,7 +75,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
   if (isNumber(winRate)) {
     fields.push({
       name: "Win Rate",
-      value: String(Math.round(winRate!)),
+      value: `${String(Math.round(winRate!))}%`,
       inline: false,
     });
   }
