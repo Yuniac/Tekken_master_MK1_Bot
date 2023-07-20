@@ -35,7 +35,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
   const winRate = (matchesWonByUser * 100) / matchesCount;
 
   if (!mongoUser) {
-    return interaction.reply(
+    return interaction.followUp(
       "Looks like you aren't registered yet! Use **/reg** to start your journy!"
     );
   }

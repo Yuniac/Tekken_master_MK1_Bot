@@ -18,7 +18,6 @@ export async function initScoreBoard(client: DiscordClient) {
 
     while (content.length) {
       const messagesArrayToBeSent = content.split("\n", 20).join("\n");
-      console.log(messagesArrayToBeSent);
       content = content.slice(messagesArrayToBeSent.length);
 
       channel.send(`${"```cpp"}

@@ -57,24 +57,25 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
   ]);
 
   if (!mongoUser || !user) {
-    return interaction.reply(
+    return interaction.followUp(
       `Error: Looks like this user (**${user?.username}**) isn't registered yet. We have no info about them.`
     );
   }
+
   const users = sortedUniqBy(
     (matchesUserWasIn as unknown as MongoMatch[])
       .map((m) => [m.player1, m.player2])
       .flat()
-      .filter((user) => user?.name !== mongoUser.name)
+      .filter((_user) => _user?.name !== mongoUser.name)
       .sort(
         (a, b) => (b as MongooseUser)?.points - (a as MongooseUser)?.points
       ),
-    (user) => user?._id.valueOf()
+    (_user) => _user?._id.valueOf()
   );
 
-  const generateLineOfDataUserByUser = (user: MongooseUser) => {
+  const generateLineOfDataUserByUser = (_user: MongooseUser) => {
     const matches = matchesUserWasIn.filter((m) =>
-      [m.player1Name, m.player2Name].includes(user.name)
+      [m.player1Name, m.player2Name].includes(_user.name)
     );
 
     const matchesVsOpponentIWon = matches.filter(
@@ -82,8 +83,8 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
     );
 
     const name = mongoUser.name;
-    const opponentName = user.name;
-    const opponentPoints = String(user.points);
+    const opponentName = _user.name;
+    const opponentPoints = String(_user.points);
     const sets = String(matches.length);
     const score = `${matchesVsOpponentIWon.length}-${matches.length}`;
     const winRate = `%${String(
@@ -133,14 +134,14 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
     },
   });
 
-  const message = `${"```cpp"}
+  let message = `
 Below are ${mongoUser.name}'s all time stats:
 ${generateHeader()}
 \r  
 ${stats}
 
 \r  
-Tekken Master MK1 Ladder bot.${"```"}`;
+Powered by Tekken Master MK1 Ladder bot.`;
 
   const statsChannel = interaction.client.channels.cache.get(ChannelIds.stats);
 
@@ -151,6 +152,16 @@ Tekken Master MK1 Ladder bot.${"```"}`;
   if (statsChannel) {
     const channel = statsChannel as TextChannel;
     channel.sendTyping();
+
+    while (message.length) {
+      const messagesArrayToBeSent = message.split("\n", 20).join("\n");
+      message = message.slice(messagesArrayToBeSent.length);
+
+      channel.send(`${"```cpp"}
+${messagesArrayToBeSent}
+${"```"}`);
+    }
+
     channel.send(message);
   }
 };
