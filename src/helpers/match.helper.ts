@@ -233,7 +233,7 @@ export class MatchHelper {
 
   static async rehydrateScoreBoardMessage(client: DiscordClient) {
     const channel = (await client.channels.cache.get(
-      ChannelIds.scoreboardDev
+      ChannelIds.scoreboard
     )!) as TextChannel;
 
     console.log("Started cleaning the scoreboard");
@@ -241,9 +241,9 @@ export class MatchHelper {
     let hasMessages = true;
 
     while (hasMessages) {
-      const messages = await channel.messages.fetch({ limit: 100 });
-      await channel.bulkDelete(messages);
-      const remainingMessages = await channel.messages.fetch({ limit: 100 });
+      const messages = (await channel?.messages?.fetch({ limit: 100 })) || [];
+      await channel?.bulkDelete(messages);
+      const remainingMessages = await channel?.messages?.fetch({ limit: 100 });
 
       if (remainingMessages.size <= 0) {
         hasMessages = false;

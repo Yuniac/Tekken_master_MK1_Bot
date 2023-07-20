@@ -5,7 +5,6 @@ require("dotenv").config({
 import cron from "node-cron";
 import { initDiscord } from "./discord/main";
 import mongoose from "mongoose";
-import { initScoreBoard } from "./discord/scoreboard";
 import { MatchHelper } from "./helpers/match.helper";
 
 const client = initDiscord();

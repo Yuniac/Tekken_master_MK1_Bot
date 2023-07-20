@@ -12,7 +12,6 @@ import { MatchHelper } from "./match.helper";
 import { format } from "date-fns";
 import { ChannelIds } from "../models/enums/channelIDs";
 import { MongooseUser } from "../types/mongoose/User";
-import { MongoMatch } from "../types/mongoose/Match";
 
 export class StringHelper {
   static humanize(str: string) {
@@ -152,8 +151,17 @@ export class StringHelper {
   }
 
   static buildScoreBoardMesssage(data: string) {
+    if (!data.length) {
+      return `Welcome to the scoreboard (Powerd by Tekken Master Leaderboard bot. Refreshes every 6 hours). 
+      
+Once there is data available, we will make sure to display it here!
+`;
+    }
     const message = `
-The scoreboard (Powerd by Tekken Master Leaderboard bot. Refreshes every 6 hours.)
+The scoreboard (Powerd by Tekken Master Leaderboard bot. Refreshes every 6 hours. Last refresh was ${format(
+      new Date(),
+      "EEEE dd-K:a"
+    )})
 
 ${data}    
 `;

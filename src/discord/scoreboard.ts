@@ -7,7 +7,7 @@ import { MatchHelper } from "../helpers/match.helper";
 export async function initScoreBoard(client: DiscordClient) {
   try {
     const channel = client.channels.cache.get(
-      ChannelIds.scoreboardDev
+      ChannelIds.scoreboard
     ) as TextChannel;
 
     channel.sendTyping();
