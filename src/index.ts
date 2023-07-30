@@ -1,7 +1,7 @@
 require("dotenv").config({
   path: process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : ".env",
 });
-process.env.TZ = "Etc/GMT+3"
+process.env.TZ = "Etc/GMT+3";
 
 import cron from "node-cron";
 import { initDiscord } from "./discord/main";
@@ -15,9 +15,13 @@ client.on("ready", () => {
   MatchHelper.rehydrateScoreBoardMessage(client);
 
   // Every 6 hours
-  cron.schedule("0 0 * * *", () => {
-    MatchHelper.rehydrateScoreBoardMessage(client);
-  });
+  cron.schedule(
+    "0 */6 * * *",
+    () => {
+      MatchHelper.rehydrateScoreBoardMessage(client);
+    },
+    { name: "Rehydrate ScoreBoard Message" }
+  );
 });
 
 mongoose.set("strictQuery", true);

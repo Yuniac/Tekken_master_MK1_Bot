@@ -12,6 +12,8 @@ import { MatchHelper } from "./match.helper";
 import { format } from "date-fns";
 import { ChannelIds } from "../models/enums/channelIDs";
 import { MongooseUser } from "../types/mongoose/User";
+import { formatInTimeZone } from "date-fns-tz";
+import enGB from "date-fns/locale/en-GB";
 
 export class StringHelper {
   static humanize(str: string) {
@@ -157,11 +159,13 @@ export class StringHelper {
 Once there is data available, we will make sure to display it here!
 `;
     }
+
+    const date = formatInTimeZone(new Date(), "Etc/GMT-3", "HH:mm zzz", {
+      locale: enGB,
+    });
+
     const message = `
-The scoreboard (Powerd by Tekken Master Leaderboard bot. Refreshes every 6 hours. Last refresh was ${format(
-      new Date(),
-      "EEEE dd-kk:a"
-    )})
+The scoreboard (Powerd by Tekken Master Leaderboard bot. Refreshes every 6 hours. Last refresh was ${date})
 
 ${data}    
 `;
