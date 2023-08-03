@@ -12,6 +12,7 @@ const UserSchema = new Schema(
     points: {
       required: true,
       type: Number,
+      unique: false,
     },
     rank: {
       required: false,

@@ -53,7 +53,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
 
     const response = `You have been successfully registered as a player in The Mortal Kombat 1 Ladder, your name is: **${createdUser.name}**. You will need this name for most things, try to remember it.
 
-    If you ever need to see your info, use **/myself**.
+To see your info, use **/myself** command.
   `;
     interaction.followUp(response);
   } catch (e: any) {
