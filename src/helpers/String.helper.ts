@@ -35,24 +35,35 @@ export class StringHelper {
 
   static buildEmebd(
     arg: {
-      title: string;
-      description: string;
+      title?: string;
+      description?: string;
       fields?: EmbedField[];
     },
     interaction: ChatInputCommandInteraction<CacheType>
   ) {
     const { title, description, fields } = arg;
 
-    return new EmbedBuilder()
+    const builder = new EmbedBuilder()
       .setAuthor({
         name: "Tekken Master Bot",
         iconURL: interaction.client.user.avatarURL() || "",
       })
       .setColor("#9B59B6")
-      .setTitle(title)
-      .setDescription(description)
-      .setFooter({ text: "Tekken Master MK1 Ladder bot." })
       .addFields(fields || []);
+
+    if (title) {
+      builder.setTitle(title);
+    }
+
+    if (description) {
+      builder.setDescription(description);
+    }
+
+    // if (footer) {
+    //    builder.setFooter({ text: "Tekken Master MK1 Ladder bot." })
+    // }
+
+    return builder;
   }
 
   static sendNotificationToBattleLogChannel(
@@ -71,31 +82,33 @@ export class StringHelper {
     if (battleLogChannel) {
       const channel = battleLogChannel as TextChannel;
       channel.sendTyping();
-      const text = `${format(new Date(), "dd-MM-Y K:a")}
+
+      const description = `**${winner.name}** (${
+        winner.points
+      }) +${pointsWon} defeated **${loser.name}** (${
+        loser.points
+      }) ${pointsLost}
       
-      **${winner.name}** (${winner.points}) +${pointsWon} defeated **${
-        loser.name
-      }** (${loser.points}) ${pointsLost}
+      ${format(new Date(), "dd-MM-Y K:a")}
       `;
 
-      const builderArg: {
+      const builderArg: Partial<{
         title: string;
         description: string;
         fields?: EmbedField[];
-      } = {
-        title: "New match report:",
-        description: text,
+      }> = {
+        description,
       };
 
       if (MatchHelper.canDisplayScores(winnerScore, loserScore)) {
         builderArg["fields"] = [
           {
-            name: `${winner.name} score:`,
+            name: `${winner.name}'s score:`,
             value: String(winnerScore),
             inline: true,
           },
           {
-            name: `${loser.name} score:`,
+            name: `${loser.name}'s score:`,
             value: String(loserScore),
             inline: true,
           },
