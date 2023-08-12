@@ -171,7 +171,7 @@ export class StringHelper {
   }
 
   static buildScoreBoardMesssage(data: string) {
-    if (!data.length) {
+    if (!data?.length) {
       return `Welcome to the scoreboard (Powerd by Tekken Master Leaderboard bot. Refreshes every 3 hours). 
       
 Once there is data available, we will make sure to display it here!
@@ -183,7 +183,7 @@ Once there is data available, we will make sure to display it here!
     });
 
     const message = `
-The scoreboard (Powerd by Tekken Master Leaderboard bot. Refreshes every 6 hours. Last refresh was ${date})
+The scoreboard (Powerd by Tekken Master Leaderboard bot. Refreshes every 3 hours. Last refresh was ${date})
 
 ${data}    
 `;

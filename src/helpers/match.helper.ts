@@ -212,7 +212,9 @@ export class MatchHelper {
 
   static async getScoreBoardData() {
     const [allPlayers, allMatches] = await Promise.all([
-      UserModal.find().sort({ points: -1 }).lean(),
+      UserModal.find({ rank: { $ne: Ranks.unranked } })
+        .sort({ points: -1 })
+        .lean(),
       MatchModal.find().lean(),
     ]);
 
