@@ -183,7 +183,7 @@ Once there is data available, we will make sure to display it here!
     });
 
     const message = `
-The scoreboard (Powerd by Tekken Master Leaderboard bot. Refreshes every 3 hours. Last refresh was ${date})
+The scoreboard (Powerd by Tekken Master Leaderboard bot. Refreshes every 3 hours. The scoreboard was last refreshed at ${date})
 
 ${data}    
 `;
