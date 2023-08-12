@@ -83,13 +83,18 @@ export class StringHelper {
       const channel = battleLogChannel as TextChannel;
       channel.sendTyping();
 
-      const description = `**${winner.name}** (${
-        winner.points
-      }) +${pointsWon} defeated **${loser.name}** (${
-        loser.points
-      }) ${pointsLost}
-      
-      ${format(new Date(), "dd-MM-Y K:a")}
+      const date = formatInTimeZone(
+        new Date(),
+        "Etc/GMT-3",
+        "dd/MM HH:mm zzz",
+        {
+          locale: enGB,
+        }
+      );
+
+      const description = `**${winner.name}** (${winner.points}) +${pointsWon} defeated **${loser.name}** (${loser.points}) ${pointsLost}
+
+      ${date}
       `;
 
       const builderArg: Partial<{
@@ -167,7 +172,7 @@ export class StringHelper {
 
   static buildScoreBoardMesssage(data: string) {
     if (!data.length) {
-      return `Welcome to the scoreboard (Powerd by Tekken Master Leaderboard bot. Refreshes every 6 hours). 
+      return `Welcome to the scoreboard (Powerd by Tekken Master Leaderboard bot. Refreshes every 3 hours). 
       
 Once there is data available, we will make sure to display it here!
 `;

@@ -72,7 +72,7 @@ const execute = async (interaction: ChatInputCommandInteraction<CacheType>) => {
     },
   ];
 
-  if (isNumber(winRate)) {
+  if (isNumber(winRate) && !isNaN(winRate)) {
     fields.push({
       name: "Win Rate",
       value: `${String(Math.round(winRate!))}%`,
