@@ -16,7 +16,7 @@ client.on("ready", () => {
 
   // Every 3 hours
   cron.schedule(
-    "0 */3 * * *",
+    "*/30 * * * *",
     () => {
       MatchHelper.rehydrateScoreBoardMessage(client);
     },

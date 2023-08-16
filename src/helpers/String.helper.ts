@@ -140,7 +140,7 @@ export class StringHelper {
       const channel = battleLogChannel as TextChannel;
       channel.sendTyping();
 
-      const text = `${format(new Date(), "dd-MM-Y K:a")}
+      const text = `
       
       **Hey, ${
         player.name
@@ -172,7 +172,7 @@ export class StringHelper {
 
   static buildScoreBoardMesssage(data: string) {
     if (!data?.length) {
-      return `Welcome to the scoreboard (Powerd by Tekken Master Leaderboard bot. Refreshes every 3 hours). 
+      return `Welcome to the scoreboard (Powerd by Tekken Master Leaderboard bot. Refreshes every 30 minutes). 
       
 Once there is data available, we will make sure to display it here!
 `;
@@ -183,7 +183,7 @@ Once there is data available, we will make sure to display it here!
     });
 
     const message = `
-The scoreboard (Powerd by Tekken Master Leaderboard bot. Refreshes every 3 hours. The scoreboard was last refreshed at ${date})
+The scoreboard (Powerd by Tekken Master Leaderboard bot. Refreshes every 30 minutes hours. The scoreboard was last refreshed at ${date})
 
 ${data}    
 `;
